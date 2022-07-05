@@ -65,5 +65,15 @@ namespace OverAudible.Services
         {
             collections.Add(c);
         }
+
+        public void AddItemToWishlist(Item item)
+        {
+            wishlist.Add(item);
+        }
+
+        public void DeleteItemFromWishlist(Item item)
+        {
+            wishlist.Remove(item);
+        }
     }
 }

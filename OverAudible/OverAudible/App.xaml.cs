@@ -68,7 +68,7 @@ namespace OverAudible
                 c = await ApiClient.GetInstance("", "");
             }
             catch { }
-
+           
             if (c is null)
             {
                 LoginWindow w = new();

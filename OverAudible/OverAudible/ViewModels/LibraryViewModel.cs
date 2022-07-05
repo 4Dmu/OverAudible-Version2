@@ -49,6 +49,14 @@ namespace OverAudible.ViewModels
             {
                 Collections.Add(msg.Collection);
             }
+
+            if (obj.InnerMessage is WishlistModifiedMessage msg2)
+            {
+                if (msg2.Action == WishlistAction.Added)
+                    Wishlist.Add(msg2.Item);
+                if (msg2.Action == WishlistAction.Removed)
+                    Wishlist.Remove(msg2.Item);
+            }    
         }
 
         [RelayCommand]

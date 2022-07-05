@@ -15,6 +15,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using OverAudible.Models;
+
 
 namespace OverAudible.Views
 {
@@ -27,6 +29,22 @@ namespace OverAudible.Views
         {
             InitializeComponent();
             this.DataContext = vm;
+        }
+
+        private void RemoveItem(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button b && b.DataContext is Item i)
+            {
+                viewModel.RemoveFromCartCommand.Execute(i);
+            }
+        }
+
+        private void RemoveAndMoveItem(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button b && b.DataContext is Item i)
+            {
+                viewModel.RemoveFromCartAndAddToWishlistCommand.Execute(i);
+            }
         }
     }
 }

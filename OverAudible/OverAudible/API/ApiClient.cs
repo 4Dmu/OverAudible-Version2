@@ -213,8 +213,10 @@ namespace OverAudible.API
 
             var dto = AudibleApi.Common.ProductsDtoV10.FromJson(jObj.ToString());
 
-            return Shell.DependencyService.ServiceProvider.GetRequiredService<IMapper>().Map<List<Item>>(dto.Products.ToList());
-        }
+            var l = Shell.DependencyService.ServiceProvider.GetRequiredService<IMapper>().Map<List<Item>>(dto.Products.ToList());
 
+            return l;
+        }
+        
     }
 }

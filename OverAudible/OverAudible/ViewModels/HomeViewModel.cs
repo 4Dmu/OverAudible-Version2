@@ -36,7 +36,7 @@ namespace OverAudible.ViewModels
                 IsBusy = true;
                 HomePage = await _homeService.GetPage();
             }
-            catch
+            catch (Exception ex)
             {
                 MessageBox.Show(App.Current.MainWindow, "Failed to load home page", "Error");
             }
