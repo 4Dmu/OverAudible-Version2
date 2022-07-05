@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OverAudible", "OverAudible\OverAudible.csproj", "{6B0CC669-7900-4F88-ABDD-B029DEE9785B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShellUI", "..\..\..\ShellUI\ShellUI\ShellUI\ShellUI.csproj", "{C3AC898F-F77C-48E8-A52B-60CE9CFC6F68}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShellUI.Theme", "..\..\..\ShellUI\ShellUI\ShellUI.Theme\ShellUI.Theme.csproj", "{51A979D2-BDAD-4A1D-822F-2288B0CBFF6B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudibleApi", "..\..\..\AudibleClone\AudibleApiRepoFixed\AudibleApi\AudibleApi\AudibleApi.csproj", "{D3447524-E1CB-4184-BC6A-6BA0E404A299}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "U2UConsult.RichHtmlTextBlock", "..\..\..\..\..\wpf-resources\U2UConsult.HtmlTextBlock.Sample\U2UConsult.RichHtmlTextBlock\U2UConsult.RichHtmlTextBlock.csproj", "{0FE10AA6-D73E-4C3D-A331-258F21B220E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B0CC669-7900-4F88-ABDD-B029DEE9785B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B0CC669-7900-4F88-ABDD-B029DEE9785B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B0CC669-7900-4F88-ABDD-B029DEE9785B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B0CC669-7900-4F88-ABDD-B029DEE9785B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3AC898F-F77C-48E8-A52B-60CE9CFC6F68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3AC898F-F77C-48E8-A52B-60CE9CFC6F68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3AC898F-F77C-48E8-A52B-60CE9CFC6F68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3AC898F-F77C-48E8-A52B-60CE9CFC6F68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51A979D2-BDAD-4A1D-822F-2288B0CBFF6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51A979D2-BDAD-4A1D-822F-2288B0CBFF6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51A979D2-BDAD-4A1D-822F-2288B0CBFF6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51A979D2-BDAD-4A1D-822F-2288B0CBFF6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3447524-E1CB-4184-BC6A-6BA0E404A299}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3447524-E1CB-4184-BC6A-6BA0E404A299}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3447524-E1CB-4184-BC6A-6BA0E404A299}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3447524-E1CB-4184-BC6A-6BA0E404A299}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FE10AA6-D73E-4C3D-A331-258F21B220E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FE10AA6-D73E-4C3D-A331-258F21B220E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FE10AA6-D73E-4C3D-A331-258F21B220E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FE10AA6-D73E-4C3D-A331-258F21B220E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {617C9389-974C-4FAE-8EB5-43ACF1286D99}
+	EndGlobalSection
+EndGlobal

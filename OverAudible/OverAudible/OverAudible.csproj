@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0-preview.5.22301.12" />
+    <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
+    <PackageReference Include="syncfusion.ui.wpf.net" Version="20.1.0.47" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\wpf-resources\U2UConsult.HtmlTextBlock.Sample\U2UConsult.RichHtmlTextBlock\U2UConsult.RichHtmlTextBlock.csproj" />
+    <ProjectReference Include="..\..\..\..\AudibleClone\AudibleApiRepoFixed\AudibleApi\AudibleApi\AudibleApi.csproj" />
+    <ProjectReference Include="..\..\..\..\ShellUI\ShellUI\ShellUI.Theme\ShellUI.Theme.csproj" />
+    <ProjectReference Include="..\..\..\..\ShellUI\ShellUI\ShellUI\ShellUI.csproj" />
+  </ItemGroup>
+
+</Project>
