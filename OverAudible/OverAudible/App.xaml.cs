@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OverAudible.API;
+using OverAudible.DownloadQueue;
 using OverAudible.Services;
 using OverAudible.Views;
 using ShellUI;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,6 +18,17 @@ using System.Windows.Media;
 
 namespace OverAudible
 {
+    public static class Constants
+    {
+        public static string DownloadFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\OverAudible";
+
+        public static string EnsureFolderExists(this string s)
+        {
+            Directory.CreateDirectory(s);
+            return s;
+        }
+    }
+
     public partial class App : Application
     {
         IHost _host;
@@ -27,6 +40,7 @@ namespace OverAudible
                 {
                     services.AddAutoMapper(typeof(App).Assembly);
                     services.AddSingleton<MediaPlayer>();
+                    services.AddSingleton<IDownloadQueue, BlockingCollectionQueue>();
                     services.AutoRegisterDependencies(this.GetType().Assembly.GetTypes());
                 })
                 .Build();
@@ -61,6 +75,7 @@ namespace OverAudible
             .AddFlyoutItem(new FlyoutItem("Cart", nameof(CartView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Cart))
             .AddFlyoutItem(new FlyoutItem("Settings",nameof(SettingsView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Settings));
 
+            Constants.DownloadFolder.EnsureFolderExists();
             
             ApiClient c = null;
             try

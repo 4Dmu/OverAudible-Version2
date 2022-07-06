@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -293,6 +294,28 @@ namespace OverAudible.Models
         {
             get;
             set;
+        }
+
+        public bool ActualIsDownloaded => GetIsDownloaded();
+
+        private bool GetIsDownloaded()
+        {
+            if (!Directory.Exists(Constants.DownloadFolder))
+                return false;
+            string[] files = Directory.GetFiles(Constants.DownloadFolder, "*", SearchOption.AllDirectories);
+            foreach (string file in files)
+            {
+                string name = Path.GetFileName(file);
+                if (!name.Contains("PART"))
+                {
+                    string n = Path.GetFileNameWithoutExtension(file);
+                    if (n == this.Asin)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         [JsonProperty("is_finished")]

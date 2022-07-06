@@ -12,6 +12,7 @@ using ShellUI.Controls;
 using OverAudible.EventMessages;
 using OverAudible.Helpers;
 using OverAudible.API;
+using OverAudible.DownloadQueue;
 
 namespace OverAudible.Commands
 {
@@ -115,13 +116,27 @@ namespace OverAudible.Commands
     [Inject(InjectionType.Transient)]
     public class DownloadCommand : AsyncCommandBase
     {
+        private readonly IDownloadQueue _queue;
+
+        public DownloadCommand(IDownloadQueue queue)
+        {
+            _queue = queue;
+        }
+
         public async override Task ExecuteAsync(object paramater)
         {
             await Task.Delay(1);
 
             if (paramater is Item item)
             {
+                if (item.ActualIsDownloaded)
+                {
+                    MessageBox.Show(Shell.Current, "Book is already downloaded", "Alert") ;
+                    return;
+                }
 
+                _queue.Enqueue(new QueueFile(item.Asin, item.Title));
+                
             }
         }
     }

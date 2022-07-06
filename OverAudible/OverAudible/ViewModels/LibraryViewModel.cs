@@ -2,6 +2,7 @@
 using MvvmHelpers;
 using OverAudible.API;
 using OverAudible.Commands;
+using OverAudible.DownloadQueue;
 using OverAudible.EventMessages;
 using OverAudible.Models;
 using OverAudible.Services;
@@ -33,7 +34,7 @@ namespace OverAudible.ViewModels
 
         public bool IsPlayingSample { get; set; } = false;
 
-        public LibraryViewModel(LibraryService libraryService, StandardCommands standardCommands)
+        public LibraryViewModel(LibraryService libraryService, StandardCommands standardCommands, IDownloadQueue download)
         {
             _libraryService = libraryService;
             StandardCommands = standardCommands;
@@ -41,6 +42,10 @@ namespace OverAudible.ViewModels
             Wishlist = new();
             Collections = new();
             Shell.Current.EventAggregator.Subscribe<RefreshLibraryMessage>(OnLibraryRefreshMessageReceived);
+            download.ProgressChanged += (pco) =>
+            {
+                Debug.WriteLine($"{pco.Asin} | {pco.Title} | pc: {pco.downloadProgress.ProgressPercentage} |  br: {pco.downloadProgress.BytesReceived} | tbr: {pco.downloadProgress.TotalBytesToReceive}");
+            };
         }
 
         private void OnLibraryRefreshMessageReceived(RefreshLibraryMessage obj)
