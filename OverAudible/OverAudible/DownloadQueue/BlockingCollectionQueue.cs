@@ -64,14 +64,25 @@ namespace OverAudible.DownloadQueue
                 var d = new Progress<DownloadProgress>();
                 EventHandler<DownloadProgress> del = (object? sender, DownloadProgress e) => { if (e.ProgressPercentage is not null) { percentComplete = (float)e.ProgressPercentage; currentJob = job; } };
                 d.ProgressChanged += del;
+
                 var api = await ApiClient.GetInstance();
+
                 await api.Api.DownloadAsync(job.asin, new LibraryPath(Constants.DownloadFolder), new AsinTitlePair(job.asin, job.name), d);
+
                 var m = await api.Api.GetLibraryBookMetadataAsync(job.asin);
                 await _dataService.UpdateMetadata(job.asin, m);
+
+                var book = await _dataService.GetById(job.asin);
+                if (book is not null && book.ProductImages is not null && book.ProductImages.The500 is not null)
+                    await IDownloadQueue.DownloadImageAsync(Constants.DownloadFolder + @"\" +job.asin, job.asin + "_Cover", book.ProductImages.The500 );
+
                 d.ProgressChanged -= del;
                 _timer.Enabled = false;
+
                 queueFiles.Remove(job);
+
                 UpdatedQueueCount?.Invoke(_jobs.Count);
+
                 if (_jobs.Count == 0)
                     QueueEmptied?.Invoke();
             }

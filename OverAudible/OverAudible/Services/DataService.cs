@@ -24,11 +24,17 @@ namespace OverAudible.Services
         {
             using (MainDbContext context = _factory.CreateDbContext())
             {
-                var dto = new ItemDTO() 
-                { 
-                    Asin = entity.Asin, 
-                    Item = JsonConvert.SerializeObject(entity) 
+                var dto = new ItemDTO()
+                {
+                    Asin = entity.Asin,
+                    Item = JsonConvert.SerializeObject(entity),
+                    ContentMetadataJson = String.Empty
                 };
+
+                if (context.OfflineLibrary.Contains(dto))
+                {
+                    return await Update(entity.Asin, entity);
+                }
 
                 await context.OfflineLibrary.AddAsync(dto);
                 await context.SaveChangesAsync();
@@ -123,7 +129,8 @@ namespace OverAudible.Services
                 var dto = new ItemDTO()
                 {
                     Asin = entity.Asin,
-                    Item = JsonConvert.SerializeObject(entity)
+                    Item = JsonConvert.SerializeObject(entity),
+                    ContentMetadataJson = String.Empty
                 };
 
                 context.OfflineLibrary.Update(dto);
