@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MvvmHelpers;
 using OverAudible.API;
 using OverAudible.Commands;
@@ -22,9 +23,11 @@ using System.Windows.Media;
 namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Transient)]
+    [QueryProperty("UseOfflineMode", "UseOfflineMode")]
     public partial class LibraryViewModel : ViewModelBase
     {
         private readonly LibraryService _libraryService;
+        private readonly IDataService<Item> _dataService;
 
         public ConcurrentObservableCollection<Item> Library { get; set; }
         public ConcurrentObservableCollection<Item> Wishlist { get; set; }
@@ -34,7 +37,13 @@ namespace OverAudible.ViewModels
 
         public bool IsPlayingSample { get; set; } = false;
 
-        public LibraryViewModel(LibraryService libraryService, StandardCommands standardCommands, IDownloadQueue download)
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DontUseOfflineMode))]
+        bool useOfflineMode;
+
+        public bool DontUseOfflineMode => !UseOfflineMode;
+
+        public LibraryViewModel(LibraryService libraryService, StandardCommands standardCommands, IDownloadQueue download, IDataService<Item> dataService)
         {
             _libraryService = libraryService;
             StandardCommands = standardCommands;
@@ -46,6 +55,7 @@ namespace OverAudible.ViewModels
             {
                 Debug.WriteLine($"{pco.Asin} | {pco.Title} | pc: {pco.downloadProgress.ProgressPercentage} |  br: {pco.downloadProgress.BytesReceived} | tbr: {pco.downloadProgress.TotalBytesToReceive}");
             };
+            _dataService = dataService;
         }
 
         private void OnLibraryRefreshMessageReceived(RefreshLibraryMessage obj)
@@ -90,8 +100,6 @@ namespace OverAudible.ViewModels
             }
         }
 
-        
-
         [RelayCommand]
         void Sample(Item item)
         {
@@ -109,63 +117,72 @@ namespace OverAudible.ViewModels
 
         public async Task LoadAsync()
         {
-            if (IsBusy)
-                return;
-            
-            try
+            if (UseOfflineMode)
             {
-                IsBusy = true;
-
-                var l = await _libraryService.GetLibraryAsync();
-                var w = await _libraryService.GetWishlistAsync();
-                var c = await _libraryService.GetCollectionsAsync();
-
-                if (Library.Count > 0)
-                    Library.Clear();
+                var l = await _dataService.GetAll();
                 Library.AddRange(l);
+            }
 
-                if (Wishlist.Count > 0)
-                    Wishlist.Clear();
-                Wishlist.AddRange(w);
+            else
+            {
+                if (IsBusy)
+                    return;
 
-                if (Collections.Count > 0)
-                    Collections.Clear();
-                Collections.AddRange(c);
-
-                foreach (Collection col in Collections)
+                try
                 {
-                    if (col.BookAsins.Count == 1)
+                    IsBusy = true;
+
+                    var l = await _libraryService.GetLibraryAsync();
+                    var w = await _libraryService.GetWishlistAsync();
+                    var c = await _libraryService.GetCollectionsAsync();
+
+                    if (Library.Count > 0)
+                        Library.Clear();
+                    Library.AddRange(l);
+
+                    if (Wishlist.Count > 0)
+                        Wishlist.Clear();
+                    Wishlist.AddRange(w);
+
+                    if (Collections.Count > 0)
+                        Collections.Clear();
+                    Collections.AddRange(c);
+
+                    foreach (Collection col in Collections)
                     {
-                        col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
-                    }
-                    if (col.BookAsins.Count == 2)
-                    {
-                        col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
-                        col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
-                    }
-                    if (col.BookAsins.Count == 3)
-                    {
-                        col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
-                        col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
-                        col.Image3 = Library.First(x => x.Asin == col.BookAsins[2]).ProductImages.The500.AbsoluteUri;
-                    }
-                    if (col.BookAsins.Count == 4)
-                    {
-                        col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
-                        col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
-                        col.Image3 = Library.First(x => x.Asin == col.BookAsins[2]).ProductImages.The500.AbsoluteUri;
-                        col.Image4 = Library.First(x => x.Asin == col.BookAsins[3]).ProductImages.The500.AbsoluteUri;
+                        if (col.BookAsins.Count == 1)
+                        {
+                            col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
+                        }
+                        if (col.BookAsins.Count == 2)
+                        {
+                            col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
+                            col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
+                        }
+                        if (col.BookAsins.Count == 3)
+                        {
+                            col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
+                            col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
+                            col.Image3 = Library.First(x => x.Asin == col.BookAsins[2]).ProductImages.The500.AbsoluteUri;
+                        }
+                        if (col.BookAsins.Count == 4)
+                        {
+                            col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
+                            col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
+                            col.Image3 = Library.First(x => x.Asin == col.BookAsins[2]).ProductImages.The500.AbsoluteUri;
+                            col.Image4 = Library.First(x => x.Asin == col.BookAsins[3]).ProductImages.The500.AbsoluteUri;
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                
-            }
-            finally
-            {
-                IsBusy = false;
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
             }
 
         }

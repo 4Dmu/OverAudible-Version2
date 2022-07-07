@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AudibleApi;
 
 namespace OverAudible.Models.DTOs
 {
@@ -13,5 +14,8 @@ namespace OverAudible.Models.DTOs
         public string Asin { get; set; }
 
         public string Item { get; set; }
+
+        public string ContentMetadataJson { get; set; }
+        
     }
 }

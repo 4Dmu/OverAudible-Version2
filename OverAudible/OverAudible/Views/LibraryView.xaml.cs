@@ -85,6 +85,19 @@ namespace OverAudible.Views
                     {
                         {"ItemParam", item }
                     });
+
+                    if (viewModel.UseOfflineMode)
+                    {
+                        Shell.Current.OvverideBackButton = true;
+                        Shell.Current.BackButtonCommand = new ShellUI.Commands.AsyncRelayCommand( async () =>
+                        {
+                            await Shell.Current.GoToAsync(nameof(LibraryView), true, ShellWindow.Direction.Left, new Dictionary<string, object>
+                            {
+                                { "UseOfflineMode", true }
+                            });
+                        });
+
+                    }
                 }
             }
         }
@@ -179,6 +192,12 @@ namespace OverAudible.Views
 
         private void Sample_Click(object sender, RoutedEventArgs e)
         {
+            if (viewModel.UseOfflineMode)
+            {
+                DisplayAlert("Alert", "You are currently in offline mode, please connect to the internet and restart the app to play samples.");
+                return;
+            }
+
             if (sender is Button b)
             {
                 if (b.DataContext is Item i)

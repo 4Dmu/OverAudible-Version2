@@ -14,7 +14,7 @@
                     Title="Library"
             >
     <Grid>
-        <TabControl >
+        <TabControl>
             
             <TabItem Header="Books" Width="100">
                 <ScrollViewer>
@@ -119,8 +119,8 @@
                     </ItemsControl>
                 </ScrollViewer>
             </TabItem>
-            
-            <TabItem Header="Wishlist" Width="100">
+
+            <TabItem Header="Wishlist" Width="100" Visibility="{Binding DontUseOfflineMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer>
                     <ItemsControl ItemsSource="{Binding Wishlist}" Margin="0,0,0,0">
                         <ItemsControl.ItemTemplate>
@@ -210,8 +210,8 @@
                     </ItemsControl>
                 </ScrollViewer>
             </TabItem>
-            
-            <TabItem Header="Collections" Width="100">
+
+            <TabItem Header="Collections" Width="100" Visibility="{Binding DontUseOfflineMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ScrollViewer>
                     <Grid>
                         <Grid.RowDefinitions>

@@ -33,4 +33,48 @@ namespace OverAudible.Converters
             throw new NotImplementedException();
         }
     }
+
+    public class MinutesToShorterLengthStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string extra = string.Empty;
+            bool first = false;
+            if (parameter is string s)
+            {
+                if (s.First() == '+')
+                {
+                    extra = s.Remove(0, 1);
+                    first = false;
+                }
+                else
+                {
+                    extra = s;
+                    first = true;
+                }
+            }
+
+            if (value is double d)
+            {
+                var t = TimeSpan.FromMinutes(d);
+                return first is true ? extra + $"{t.Hours}h {t.Minutes}m" : $"{t.Hours}h {t.Minutes}m" + extra;
+            }
+
+            if (value is int i)
+            {
+                double d1 = i / 60;
+                var t = TimeSpan.FromHours(d1);
+                return first is true ? extra + $"{(t.Days * 24) + t.Hours}h {t.Minutes}m" : $"{(t.Days * 24) + t.Hours}h {t.Minutes}m" + extra;
+            }
+
+            
+
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

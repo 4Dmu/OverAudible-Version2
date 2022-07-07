@@ -22,6 +22,7 @@
             <converters:SeriesToStringConverter x:Key="SeriesToStringConverter" />
             <converters:AddTextAfterDataConverter x:Key="AddTextAfterDataConverter" />
             <converters:BoolsToVisibilityInvertLastBoolConverter x:Key="BoolsToVisibilityInvertLastBoolConverter" />
+            <converters:MinutesToShorterLengthStringConverter x:Key="MinutesToShorterLengthStringConverter" />
 
         </ResourceDictionary>
     </Application.Resources>

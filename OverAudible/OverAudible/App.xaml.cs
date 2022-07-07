@@ -18,6 +18,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using OverAudible.Models;
+using System.Globalization;
+using System.Net;
+using System.Windows.Media.Imaging;
 
 namespace OverAudible
 {
@@ -46,6 +50,8 @@ namespace OverAudible
 
                     services.AddAutoMapper(typeof(App).Assembly);
                     services.AddDbContext<MainDbContext>(configureDbContext);
+                    services.AddSingleton<MainDbContextFactory>(new MainDbContextFactory(configureDbContext));
+                    services.AddSingleton<IDataService<Item>, DataService>();
                     services.AddSingleton<MediaPlayer>();
                     services.AddSingleton<IDownloadQueue, BlockingCollectionQueue>();
                     services.AutoRegisterDependencies(this.GetType().Assembly.GetTypes());
@@ -62,7 +68,6 @@ namespace OverAudible
             var data = _host.Services.GetRequiredService<MainDbContext>();
 
             data.Database.Migrate();
-
             
             Routing.RegisterRoute(nameof(HomeView), typeof(HomeView));
             Routing.RegisterRoute(nameof(LibraryView), typeof(LibraryView));
@@ -74,40 +79,73 @@ namespace OverAudible
             Routing.RegisterRoute(nameof(NewCollectionModal), typeof(NewCollectionModal));
             Routing.RegisterRoute(nameof(FilterModal), typeof(FilterModal));
 
-            MainWindow = new Shell()
-            {
-                Title = "OverAudible",
-                UseSecondTitleBar = true,
-                FlyoutIconVisibility = FlyoutIconVisibility.BottomBar,
-                FLyoutNavigationDuration = new Duration(TimeSpan.FromSeconds(.05))
-            }
-            .AddFlyoutItem(new FlyoutItem("Home",nameof(HomeView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Home))
-            .AddFlyoutItem(new FlyoutItem("Library",nameof(LibraryView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Books))
-            .AddFlyoutItem(new FlyoutItem("Browse",nameof(BrowseView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Search))
-            .AddFlyoutItem(new FlyoutItem("Cart", nameof(CartView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Cart))
-            .AddFlyoutItem(new FlyoutItem("Settings",nameof(SettingsView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Settings));
-
             Constants.DownloadFolder.EnsureFolderExists();
             
-            ApiClient c = null;
-            try
+            if (AppExtensions.CheckForInternetConnection())
             {
-                c = await ApiClient.GetInstance("", "");
+                MainWindow = new Shell()
+                {
+                    Title = "OverAudible",
+                    UseSecondTitleBar = true,
+                    FlyoutIconVisibility = FlyoutIconVisibility.BottomBar,
+                    FLyoutNavigationDuration = new Duration(TimeSpan.FromSeconds(.05))
+                }
+                .AddFlyoutItem(new FlyoutItem("Home", nameof(HomeView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Home))
+                .AddFlyoutItem(new FlyoutItem("Library", nameof(LibraryView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Books))
+                .AddFlyoutItem(new FlyoutItem("Browse", nameof(BrowseView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Search))
+                .AddFlyoutItem(new FlyoutItem("Cart", nameof(CartView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Cart))
+                .AddFlyoutItem(new FlyoutItem("Settings", nameof(SettingsView)).SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Settings));
+
+                ApiClient c = null;
+                try
+                {
+                    c = await ApiClient.GetInstance("", "");
+                }
+                catch { }
+
+                if (c is null)
+                {
+                    LoginWindow w = new();
+                    w.ShowDialog();
+
+                    if (w.Result == null)
+                        App.Current.Shutdown();
+                }
+
+                MainWindow.Show();
+
+                await Shell.Current.GoToAsync(nameof(HomeView), false);
             }
-            catch { }
-           
-            if (c is null)
+            else
             {
-                LoginWindow w = new();
-                w.ShowDialog();
+                MainWindow = new Shell()
+                {
+                    Title = "OverAudible",
+                    UseSecondTitleBar = true,
+                    FlyoutIconVisibility = FlyoutIconVisibility.BottomBar,
+                    FLyoutNavigationDuration = new Duration(TimeSpan.FromSeconds(.05))
+                }
+                .AddFlyoutItem(new FlyoutItem("Library", nameof(LibraryView), false, ShellWindow.Direction.Left, new Dictionary<string, object>{{ "UseOfflineMode", true }})
+                    .SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Books))
+                .AddFlyoutItem(new FlyoutItem("Settings", nameof(SettingsView))
+                    .SetIcon(MaterialDesignThemes.Wpf.PackIconKind.Settings));
 
-                if (w.Result == null)
-                    App.Current.Shutdown();
+                MainWindow.Show();
+
+                await Shell.Current.GoToAsync(nameof(LibraryView), false, ShellWindow.Direction.Left, new Dictionary<string, object>
+                {
+                    { "UseOfflineMode", true }
+                });
+
+                Shell.Current.CurrentPage.DisplayAlert("Alert", "You are currently in offline mode, " +
+                    "please connect to the internet and restart to get the apps full functionality, " +
+                    "while you are in offline mode you can only listen and view books you have already downloaded.");
             }
 
-            MainWindow.Show();
-
-            await Shell.Current.GoToAsync(nameof(HomeView), false);
+            Player p = new();
+            p.Book = new Item() { RuntimeLengthMin = 600,Title = "Some Random Made Up Title" };
+            p.Media = AppExtensions.GetImageFromString("https://m.media-amazon.com/images/I/51vQZXqjEiL._SL300_.jpg");
+            p.Show();
 
             base.OnStartup(e);  
         }
@@ -127,6 +165,46 @@ namespace OverAudible
         {
             app.Shutdown();
             System.Diagnostics.Process.Start(Environment.GetCommandLineArgs()[0]);
+        }
+
+        public static bool CheckForInternetConnection(int timeoutMs = 10000, string url = null)
+        {
+            try
+            {
+                url ??= CultureInfo.InstalledUICulture switch
+                {
+                    { Name: var n } when n.StartsWith("fa") => // Iran
+                        "http://www.aparat.com",
+                    { Name: var n } when n.StartsWith("zh") => // China
+                        "http://www.baidu.com",
+                    _ =>
+                        "http://www.gstatic.com/generate_204",
+                };
+
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                request.KeepAlive = false;
+                request.Timeout = timeoutMs;
+                using (var response = (HttpWebResponse)request.GetResponse())
+                    return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static ImageSource GetImageFromURI(Uri uri)
+        {
+            BitmapImage i = new();
+            i.BeginInit();
+            i.UriSource = uri;
+            i.EndInit();
+            return i;
+        }
+
+        public static ImageSource GetImageFromString(string path)
+        {
+            return GetImageFromURI(new Uri(path));
         }
     }
 }

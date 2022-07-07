@@ -79,12 +79,38 @@ namespace OverAudible.Services
             }
         }
 
+        public async Task<List<(Item, AudibleApi.Common.ContentMetadata)>> GetAllWithMetadata()
+        {
+            using (MainDbContext context = _factory.CreateDbContext())
+            {
+                var items = await context.OfflineLibrary.ToListAsync();
+
+                List<(Item, AudibleApi.Common.ContentMetadata)> result = new();
+
+                foreach (var item in items)
+                {
+                    result.Add((JsonConvert.DeserializeObject<Item>(item.Item), JsonConvert.DeserializeObject<AudibleApi.Common.ContentMetadata>(item.ContentMetadataJson)));
+                }
+
+                return result;
+            }
+        }
+
         public async Task<Item> GetById(string id)
         {
             using (MainDbContext context = _factory.CreateDbContext())
             {
                 ItemDTO dto = await context.OfflineLibrary.FirstOrDefaultAsync(x => x.Asin == id);
                 return JsonConvert.DeserializeObject<Item>(dto.Item);
+            }
+        }
+
+        public async Task<(Item, AudibleApi.Common.ContentMetadata)> GetByIdWithMetadata(string id)
+        {
+            using (MainDbContext context = _factory.CreateDbContext())
+            {
+                ItemDTO dto = await context.OfflineLibrary.FirstOrDefaultAsync(x => x.Asin == id);
+                return (JsonConvert.DeserializeObject<Item>(dto.Item), JsonConvert.DeserializeObject<AudibleApi.Common.ContentMetadata>(dto.ContentMetadataJson));
             }
         }
 
@@ -104,6 +130,17 @@ namespace OverAudible.Services
                 await context.SaveChangesAsync();
 
                 return entity;
+            }
+        }
+
+        public async Task UpdateMetadata(string id, AudibleApi.Common.ContentMetadata extra)
+        {
+            using (MainDbContext context = _factory.CreateDbContext())
+            {
+                ItemDTO dto = await context.OfflineLibrary.FirstOrDefaultAsync(x => x.Asin == id);
+                dto.ContentMetadataJson = JsonConvert.SerializeObject(extra);
+                context.OfflineLibrary.Update(dto);
+                await context.SaveChangesAsync();
             }
         }
     }

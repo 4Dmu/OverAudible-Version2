@@ -1,6 +1,7 @@
 ﻿using AudibleApi;
 using Dinah.Core.Net.Http;
 using OverAudible.API;
+using OverAudible.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using OverAudible.Models;
 
 namespace OverAudible.DownloadQueue
 {
@@ -18,9 +20,11 @@ namespace OverAudible.DownloadQueue
         private volatile float percentComplete;
         private volatile QueueFile? currentJob;
         private System.Timers.Timer _timer;
+        private readonly IDataService<Item> _dataService;
 
-        public BlockingCollectionQueue()
+        public BlockingCollectionQueue(IDataService<Item> dataService)
         {
+            _dataService = dataService;
             _timer = new System.Timers.Timer(500);
             _timer.Elapsed += TimerTick;
             var thread = new Thread(new ThreadStart(OnStart));
@@ -62,6 +66,8 @@ namespace OverAudible.DownloadQueue
                 d.ProgressChanged += del;
                 var api = await ApiClient.GetInstance();
                 await api.Api.DownloadAsync(job.asin, new LibraryPath(Constants.DownloadFolder), new AsinTitlePair(job.asin, job.name), d);
+                var m = await api.Api.GetLibraryBookMetadataAsync(job.asin);
+                await _dataService.UpdateMetadata(job.asin, m);
                 d.ProgressChanged -= del;
                 _timer.Enabled = false;
                 queueFiles.Remove(job);

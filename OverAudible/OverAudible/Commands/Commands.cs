@@ -120,10 +120,12 @@ namespace OverAudible.Commands
     public class DownloadCommand : AsyncCommandBase
     {
         private readonly IDownloadQueue _queue;
+        private readonly IDataService<Item> _itemDataService;
 
-        public DownloadCommand(IDownloadQueue queue)
+        public DownloadCommand(IDownloadQueue queue, IDataService<Item> itemDataService)
         {
             _queue = queue;
+            _itemDataService = itemDataService;
         }
 
         public async override Task ExecuteAsync(object paramater)
@@ -139,18 +141,26 @@ namespace OverAudible.Commands
                 }
 
                 _queue.Enqueue(new QueueFile(item.Asin, item.Title));
-                
+
+                await _itemDataService.Create(item);
+
             }
 
             if (paramater is (Item, ProgressBar, SynchronizationContext))
             {
                 var par = ((Item, ProgressBar,SynchronizationContext))paramater;
 
+                Item book = par.Item1;
+                ProgressBar bar = par.Item2;
+                SynchronizationContext context = par.Item3;
+
                 if (par.Item1.ActualIsDownloaded)
                 {
                     MessageBox.Show(Shell.Current, "Book is already downloaded", "Alert");
                     return;
                 }
+
+                await _itemDataService.Create(book);
 
                 void UpdateProgress(ProgressChangedObject obj)
                 {
@@ -207,6 +217,7 @@ namespace OverAudible.Commands
 
             
         }
+
 
         void UpdateItem(ProgressBar p, double val)
         {
