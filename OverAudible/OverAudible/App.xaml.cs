@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OverAudible.API;
+using OverAudible.DbContexts;
 using OverAudible.DownloadQueue;
 using OverAudible.Services;
 using OverAudible.Views;
@@ -36,9 +39,13 @@ namespace OverAudible
         public App()
         {
             _host = Host.CreateDefaultBuilder()
-                .ConfigureServices(services =>
+                .ConfigureServices((hostContext, services) =>
                 {
+                    string connectionString = hostContext.Configuration.GetConnectionString("Default");
+                    Action<DbContextOptionsBuilder> configureDbContext = o => o.UseSqlite(connectionString);
+
                     services.AddAutoMapper(typeof(App).Assembly);
+                    services.AddDbContext<MainDbContext>(configureDbContext);
                     services.AddSingleton<MediaPlayer>();
                     services.AddSingleton<IDownloadQueue, BlockingCollectionQueue>();
                     services.AutoRegisterDependencies(this.GetType().Assembly.GetTypes());
@@ -51,6 +58,11 @@ namespace OverAudible
             _host.Start();
 
             Shell.SetServiceProvider(_host.Services);
+
+            var data = _host.Services.GetRequiredService<MainDbContext>();
+
+            data.Database.Migrate();
+
             
             Routing.RegisterRoute(nameof(HomeView), typeof(HomeView));
             Routing.RegisterRoute(nameof(LibraryView), typeof(LibraryView));
