@@ -150,8 +150,29 @@ namespace OverAudible.Views
             {
                 if (b.DataContext is Item i)
                 {
+                    if (i.IsInPlusCatalog)
+                    {
+                        DisplayAlert("Alert", "You cannot download this title because it is in the plus catalog and not owned by you.");
+                        return;
+                    }    
+
+                    if (b.Parent is StackPanel sp)
+                    {
+                        foreach (UIElement ui in sp.Children)
+                        {
+                            if (ui is ProgressBar prog && !i.ActualIsDownloaded)
+                            {
+                                b.Visibility = Visibility.Collapsed;
+                                prog.Visibility = Visibility.Visible;
+                                viewModel.StandardCommands.DownloadCommand.Execute((i, prog, System.Threading.SynchronizationContext.Current));
+                                return;
+                            }
+                        }
+                    }
+
                     viewModel.StandardCommands.DownloadCommand.Execute(i);
                 }
+                
             }
             
         }
@@ -175,6 +196,8 @@ namespace OverAudible.Views
                 }
             }
         }
+
+        
     }
 
 

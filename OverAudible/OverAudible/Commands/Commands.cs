@@ -13,6 +13,9 @@ using OverAudible.EventMessages;
 using OverAudible.Helpers;
 using OverAudible.API;
 using OverAudible.DownloadQueue;
+using System.Windows.Controls;
+using System.Threading;
+using OverAudible.Views;
 
 namespace OverAudible.Commands
 {
@@ -138,7 +141,78 @@ namespace OverAudible.Commands
                 _queue.Enqueue(new QueueFile(item.Asin, item.Title));
                 
             }
+
+            if (paramater is (Item, ProgressBar, SynchronizationContext))
+            {
+                var par = ((Item, ProgressBar,SynchronizationContext))paramater;
+
+                if (par.Item1.ActualIsDownloaded)
+                {
+                    MessageBox.Show(Shell.Current, "Book is already downloaded", "Alert");
+                    return;
+                }
+
+                void UpdateProgress(ProgressChangedObject obj)
+                {
+                    if (_queue.GetQueue().All(x => x.asin != obj.Asin))
+                    {
+                        _queue.ProgressChanged -= UpdateProgress;
+
+                        par.Item3.Post((object? s) => 
+                        {
+                            par.Item2.Visibility = System.Windows.Visibility.Collapsed;
+
+                            if (Shell.Current.CurrentPage is LibraryView view)
+                            {
+                                int i = view.viewModel.Library.IndexOf(par.Item1);
+                                view.viewModel.Library.RemoveAt(i);
+                                view.viewModel.Library.Insert(i, par.Item1);
+                            }
+
+                        }, null);
+
+                        return;
+                    }
+
+                    if (obj.Asin != par.Item1.Asin)
+                        return;
+
+                    par.Item3.Post(o => UpdateItem(par.Item2,obj.downloadProgress.ProgressPercentage != null ? (double)obj.downloadProgress.ProgressPercentage : 0 ), null);
+                }
+
+                void QueueEmptied()
+                {
+                    _queue.QueueEmptied -= QueueEmptied;
+
+                    par.Item3.Post((object? s) =>
+                    {
+                        if (Shell.Current.CurrentPage is LibraryView view)
+                        {
+                            int i = view.viewModel.Library.IndexOf(par.Item1);
+                            view.viewModel.Library.RemoveAt(i);
+                            view.viewModel.Library.Insert(i, par.Item1);
+                        }
+
+                        par.Item2.Visibility = System.Windows.Visibility.Collapsed;
+                    }, null);
+                };
+
+                _queue.ProgressChanged += UpdateProgress;
+
+                _queue.QueueEmptied += QueueEmptied;
+
+                _queue.Enqueue(new QueueFile(par.Item1.Asin, par.Item1.Title));
+
+            }
+
+            
         }
+
+        void UpdateItem(ProgressBar p, double val)
+        {
+            p.Value = val;
+        }
+
     }
 
     [Inject(InjectionType.Transient)]

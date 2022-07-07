@@ -18,7 +18,7 @@
             
             <TabItem Header="Books" Width="100">
                 <ScrollViewer>
-                    <ItemsControl ItemsSource="{Binding Library}" Margin="0,0,0,110">
+                    <ItemsControl ItemsSource="{Binding Library}" Margin="0,0,0,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:Item}">
                                 <Border CornerRadius="5" Height="150" Margin="5" MouseLeftButtonDown="LibraryBookInstance_MouseLeftButtonDown">
@@ -95,8 +95,21 @@
                                             Visibility="{Binding IsInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             Margin="5"/>
                                             <Button Content="Download" Click="Download_Click"
-                                            Visibility="{Binding IsInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                            Margin="5"/>
+                                            Margin="5">
+                                                <Button.Visibility>
+                                                    <MultiBinding Converter="{StaticResource BoolsToVisibilityInvertLastBoolConverter}">
+                                                        <Binding Path="IsInLibrary" />
+                                                        <Binding Path="ActualIsDownloaded" />
+                                                    </MultiBinding>
+                                                </Button.Visibility>
+                                            </Button>
+                                            <ProgressBar Visibility="Collapsed" Height="20"/>
+                                            <Button Visibility="{Binding ActualIsDownloaded, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="5" Padding="0,5,5,5" IsEnabled="False">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <mat:PackIcon Kind="Check" Foreground="{DynamicResource {x:Static shellUi:Brushes.AccentBrush}}" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="Downloaded"/>
+                                                </StackPanel>
+                                            </Button>
                                         </StackPanel>
 
                                     </Grid>
@@ -109,7 +122,7 @@
             
             <TabItem Header="Wishlist" Width="100">
                 <ScrollViewer>
-                    <ItemsControl ItemsSource="{Binding Wishlist}" Margin="0,0,0,110">
+                    <ItemsControl ItemsSource="{Binding Wishlist}" Margin="0,0,0,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:Item}">
                                 <Border CornerRadius="5" Height="150" Margin="5" MouseLeftButtonDown="WishlistBookInstance_MouseLeftButtonDown">
@@ -217,7 +230,7 @@
                             </Button>
                         </Grid>
                         
-                        <ItemsControl ItemsSource="{Binding Collections}" Margin="0,0,0,110" Grid.Row="1">
+                        <ItemsControl ItemsSource="{Binding Collections}" Margin="0,0,0,0" Grid.Row="1">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type models:Collection}">
                                     <Border CornerRadius="5" Height="150" Margin="5" MouseLeftButtonDown="CollectionBookInstance_MouseLeftButtonDown">

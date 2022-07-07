@@ -21,6 +21,7 @@
             <converters:AllBoolsToVisibilityConverter x:Key="AllBoolsToVisibilityConverter" />
             <converters:SeriesToStringConverter x:Key="SeriesToStringConverter" />
             <converters:AddTextAfterDataConverter x:Key="AddTextAfterDataConverter" />
+            <converters:BoolsToVisibilityInvertLastBoolConverter x:Key="BoolsToVisibilityInvertLastBoolConverter" />
 
         </ResourceDictionary>
     </Application.Resources>

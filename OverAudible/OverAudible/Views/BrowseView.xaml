@@ -36,7 +36,7 @@
                     <Button Content="Filter" Grid.Column="3" Margin="2" x:Name="filter" Click="filter_Click"/>
                 </Grid>
 
-                <StackPanel Grid.Row="1" Margin="0,20,0,110" Visibility="{Binding ShowBrowseContent, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Grid.Row="1" Margin="0,20,0,40" Visibility="{Binding ShowBrowseContent, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock Text="Browse By Category" HorizontalAlignment="Center" FontSize="25"/>
 
                     <ItemsControl ItemsSource="{Binding Categories}" MaxWidth="800">
@@ -51,7 +51,7 @@
 
                 </StackPanel>
 
-                <ItemsControl Grid.Row="1" Margin="0,0,0,100"  ItemsSource="{Binding Results}"
+                <ItemsControl Grid.Row="1" Margin="0,0,0,40"  ItemsSource="{Binding Results}"
                               Visibility="{Binding NotShowBrowseContent, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="models:Item">
@@ -144,9 +144,9 @@
             </Grid>
         </ScrollViewer>
         <syncfusion:SfBusyIndicator IsBusy="{Binding IsBusy}" Panel.ZIndex="100"/>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,75" VerticalAlignment="Bottom">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Bottom">
             <Button Content="Previous" Width="80" Margin="5" Command="{Binding NavigateBackCommand}"/>
-            <TextBlock Text="{Binding CurrentPage}"/>
+            <TextBlock Text="{Binding CurrentPage}" VerticalAlignment="Center"/>
             <Button Content="Next" Width="80" Margin="5" Command="{Binding NavigateNextCommand}"/>
         </StackPanel>
     </Grid>
