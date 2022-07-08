@@ -127,6 +127,7 @@ namespace OverAudible.Windows
             AudioPlayer.ChapterChanged += OnChapterChanged;
             AudioPlayer.SkippedBack += OnSkipBack;
             AudioPlayer.SkippedForward += OnSkipForward;
+            AudioPlayer.EndOfFileReached += OnEndOfFile;
 
             Binding binding = new();
             binding.Source = this;
@@ -137,6 +138,14 @@ namespace OverAudible.Windows
 
             Media = AppExtensions.GetImageFromString(Constants.DownloadFolder + $@"\{Book.Asin}\{Book.Asin}_Cover.jpg");
 
+        }
+
+        private void OnEndOfFile()
+        {
+            synchronizationContext.Post(o =>
+            {
+                pckPausePlay.Kind = MaterialDesignThemes.Wpf.PackIconKind.PlayCircleFilled;
+            }, null);
         }
 
         private void OnSkipForward()
@@ -210,6 +219,15 @@ namespace OverAudible.Windows
         {
             if (sender is MaterialDesignThemes.Wpf.PackIcon icon)
             {
+                if (AudioPlayer.IsAtEndOfFile)
+                {
+                    AudioPlayer.ChangeChapter(AudioPlayer.ContentMetadata.ChapterInfo.Chapters[0]);
+                    AudioPlayer.Play();
+                    icon.Kind = MaterialDesignThemes.Wpf.PackIconKind.PauseCircleFilled;
+                    AudioPlayer.IsAtEndOfFile = false;
+                    return;
+                }
+
                 if (AudioPlayer.IsPlaying)
                 {
                     AudioPlayer.Pause();
@@ -283,6 +301,8 @@ namespace OverAudible.Windows
                         if (c != null)
                         {
                             AudioPlayer.ChangeChapter(c);
+                            ShowChapters = false;
+                            ShowModal = false;
                         }
                     }
                 }

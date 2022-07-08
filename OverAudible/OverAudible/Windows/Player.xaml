@@ -65,7 +65,7 @@
                                      Grid.Column="1" 
                                      Foreground="{DynamicResource {x:Static shellUI:Brushes.ForegroundBrush}}" 
                                      MouseLeftButtonDown="Rewind30_Click" Background="Transparent"/>
-                <materialDesign:PackIcon Kind="PlayCircle" Height="30" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"
+                <materialDesign:PackIcon Kind="PlayCircle" x:Name="pckPausePlay" Height="30" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"
                                      Grid.Column="2" Foreground="{DynamicResource {x:Static shellUI:Brushes.ForegroundBrush}}" 
                                      MouseLeftButtonDown="PlayPause_Click" Background="Transparent"/>
                 <materialDesign:PackIcon Kind="FastForward30" Height="30" Width="30" VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -83,18 +83,18 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel MouseLeftButtonDown="Speed_Click">
+                <StackPanel MouseLeftButtonDown="Speed_Click" Background="Transparent">
                     <TextBlock Text="1.0x" FontSize="15" HorizontalAlignment="Center"/>
                     <TextBlock Text="Narration Speed" HorizontalAlignment="Center"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" MouseLeftButtonDown="Chapters_Click">
+                <StackPanel Grid.Column="1" MouseLeftButtonDown="Chapters_Click"  Background="Transparent">
                     <materialDesign:PackIcon Kind="Menu" HorizontalAlignment="Center" Height="20" Width="20"
                                          Foreground="{DynamicResource {x:Static shellUI:Brushes.ForegroundBrush}}"/>
                     <TextBlock Text="Chapters" HorizontalAlignment="Center"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="2" MouseLeftButtonDown="Bookmark_Click">
+                <StackPanel Grid.Column="2" MouseLeftButtonDown="Bookmark_Click"  Background="Transparent">
                     <materialDesign:PackIcon Kind="BookmarkAdd" HorizontalAlignment="Center" Height="20" Width="20"
                                          Foreground="{DynamicResource {x:Static shellUI:Brushes.ForegroundBrush}}"/>
                     <TextBlock Text="Add a Bookmark" HorizontalAlignment="Center"/>

@@ -22,6 +22,9 @@ namespace OverAudible.Windows
         private ConcatenatingSampleProvider Playlist;
         private string _asin;
         private Timer Timer;
+
+        public bool IsAtEndOfFile { get; set; }
+
         private List<FileInfo> BookParts { get; set; }
         private List<FileInfo> Files { get; set; }
         public AudibleApi.Common.ContentMetadata ContentMetadata { get; set; }
@@ -39,6 +42,7 @@ namespace OverAudible.Windows
         public event Action? SkippedBack;
         public event Action<AudibleApi.Common.Chapter>? ChapterChanged;
         public event Action PlayerStopped;
+        public event Action EndOfFileReached;
         public event Action<ElapsedEventArgs>? TimerTick;
 
         public AudibleApi.Common.Chapter CurrentChapter => ContentMetadata.ChapterInfo.Chapters[CurrentChapterNum];
@@ -149,9 +153,18 @@ namespace OverAudible.Windows
 
         private void OnTimerTick(object? sender, ElapsedEventArgs e)
         {
+            int currentChapterLength = (int)(CurrentChapter.LengthMs / 1000);
+            bool val1 = CurrentChapterNum == ContentMetadata.ChapterInfo.Chapters.Length - 1;
+            bool val2 = EllapsedTime + 1 == currentChapterLength;
+            if ( val1 && val2)
+            {
+                EndOfFile();
+                return;
+            }
+
             EllapsedTime += 1;
             RemainingTime -= 1;
-            int currentChapterLength = (int)(CurrentChapter.LengthMs / 1000);
+            
             if (EllapsedTime == currentChapterLength)
             {
                 CurrentChapterNum += 1;
@@ -178,7 +191,15 @@ namespace OverAudible.Windows
             EllapsedTime = 0;
 
             Reader.CurrentTime = TimeSpan.FromSeconds(CurrentChapter.StartOffsetSec);
-            var t = Reader.TotalTime;
+
+            if (CurrentChapter == ContentMetadata.ChapterInfo.Chapters.Last())
+            {
+                int extraTime = (int)TotalChapterSeconds() - (int)Reader.TotalTime.TotalSeconds;
+                extraTime = Math.Abs(extraTime);
+                CurrentChapter.LengthMs += extraTime * 1000;
+                OnPropertyChanged(nameof(CurrentChapter));
+            }
+
             RemainingTime = (int)(CurrentChapter.LengthMs / 1000);
             ChapterChanged?.Invoke(CurrentChapter);
         }
@@ -189,16 +210,25 @@ namespace OverAudible.Windows
         ///</summary>
         public void ChangeChapter(int direction)
         {
-            if (CurrentChapterNum + direction < 0 || CurrentChapterNum + direction > ContentMetadata.ChapterInfo.Chapters.Length)
+            if (CurrentChapterNum + direction < 0 || CurrentChapterNum + direction >= ContentMetadata.ChapterInfo.Chapters.Length)
                 return;
 
             CurrentChapterNum += direction;
             EllapsedTime = 0;
             Reader.CurrentTime = TimeSpan.FromSeconds(CurrentChapter.StartOffsetSec);
+
+            if (CurrentChapter == ContentMetadata.ChapterInfo.Chapters.Last())
+            {
+                int extraTime = (int)TotalChapterSeconds() - (int)Reader.TotalTime.TotalSeconds;
+                extraTime = Math.Abs(extraTime);
+                CurrentChapter.LengthMs += extraTime * 1000;
+                OnPropertyChanged(nameof(CurrentChapter));
+            }
+
+
             RemainingTime = (int)(CurrentChapter.LengthMs / 1000);
             ChapterChanged?.Invoke(CurrentChapter);
         }
-
 
         public void Play()
         {
@@ -216,6 +246,14 @@ namespace OverAudible.Windows
             PlaybackStoped?.Invoke();
         }
 
+        public void EndOfFile()
+        {
+            IsAtEndOfFile = true;
+            EndOfFileReached?.Invoke();
+            Pause();
+            
+        }
+
         public void SkipBack(TimeSpan amount)
         {
             if (Reader.CurrentTime.Subtract(amount).TotalSeconds < 0)
@@ -224,10 +262,7 @@ namespace OverAudible.Windows
 
             if (Reader.CurrentTime.TotalMilliseconds < CurrentChapter.StartOffsetMs)
             {
-                CurrentChapterNum-- ;
-                EllapsedTime = (int)(Reader.CurrentTime.TotalSeconds - CurrentChapter.StartOffsetSec);
-                ChapterChanged?.Invoke(CurrentChapter);
-                RemainingTime = (int)(CurrentChapter.LengthMs / 1000);
+                ChangeChapter(-1);
                 SkippedBack?.Invoke();
                 return;
             }
@@ -238,19 +273,38 @@ namespace OverAudible.Windows
 
         public void SkipForward(TimeSpan amount)
         {
+            var m = Reader.CurrentTime.Add(amount);
+            var ts = TotalChapterSeconds();
+            if (m.TotalSeconds > ts)
+                return;
+
             Reader.CurrentTime = Reader.CurrentTime.Add(amount);
-            if (Reader.CurrentTime.TotalMilliseconds > CurrentChapter.LengthMs)
+            var ms = TotalUpToCurrentChapterMs();
+            if (Reader.CurrentTime.TotalMilliseconds > ms)
             {
-                CurrentChapterNum++;
-                EllapsedTime = (int)(Reader.CurrentTime.TotalSeconds - CurrentChapter.StartOffsetSec);
-                ChapterChanged?.Invoke(CurrentChapter);
-                RemainingTime = (int)(CurrentChapter.LengthMs / 1000);
+                ChangeChapter(1);
                 SkippedForward?.Invoke();
                 return;
             }
             EllapsedTime += (int)amount.TotalSeconds;
             RemainingTime -= (int)amount.TotalSeconds;
             SkippedForward?.Invoke();
+        }
+
+        private long TotalUpToCurrentChapterMs()
+        {
+            long ms = 0;
+            for (int i = 0; i <= CurrentChapterNum; i++)
+            {
+                ms += ContentMetadata.ChapterInfo.Chapters[i].LengthMs;
+            }
+
+            return ms;
+        }
+
+        private long TotalChapterSeconds()
+        {
+            return ContentMetadata.ChapterInfo.Chapters.Sum(x => x.LengthMs) / 1000;
         }
     }
 }
