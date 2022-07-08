@@ -22,6 +22,7 @@ using OverAudible.Models;
 using System.Globalization;
 using System.Net;
 using System.Windows.Media.Imaging;
+using OverAudible.Windows;
 
 namespace OverAudible
 {
@@ -80,7 +81,14 @@ namespace OverAudible
             Routing.RegisterRoute(nameof(FilterModal), typeof(FilterModal));
 
             Constants.DownloadFolder.EnsureFolderExists();
-            
+
+            Player p = new(_host.Services.GetRequiredService<IDataService<Item>>(), new Item
+            {
+                Asin = "B07CJ4C449",
+                Title = "Random"
+            });
+            p.ShowDialog();
+
             if (AppExtensions.CheckForInternetConnection())
             {
                 MainWindow = new Shell()
@@ -142,10 +150,7 @@ namespace OverAudible
                     "while you are in offline mode you can only listen and view books you have already downloaded.");
             }
 
-            Player p = new();
-            p.Book = new Item() { RuntimeLengthMin = 600,Title = "Some Random Made Up Title" };
-            p.Media = AppExtensions.GetImageFromString("https://m.media-amazon.com/images/I/51vQZXqjEiL._SL300_.jpg");
-            p.Show();
+            
 
             base.OnStartup(e);  
         }

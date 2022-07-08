@@ -23,6 +23,8 @@
             <converters:AddTextAfterDataConverter x:Key="AddTextAfterDataConverter" />
             <converters:BoolsToVisibilityInvertLastBoolConverter x:Key="BoolsToVisibilityInvertLastBoolConverter" />
             <converters:MinutesToShorterLengthStringConverter x:Key="MinutesToShorterLengthStringConverter" />
+            <converters:ChapterToTextConverter x:Key="ChapterToTextConverter" />
+            <converters:MillisecondsToStringConverter x:Key="MillisecondsToStringConverter" />
 
         </ResourceDictionary>
     </Application.Resources>

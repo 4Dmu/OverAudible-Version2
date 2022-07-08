@@ -77,4 +77,35 @@ namespace OverAudible.Converters
             throw new NotImplementedException();
         }
     }
+
+    public class MillisecondsToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double d)
+            {
+                var t = TimeSpan.FromMilliseconds(d);
+                return $"{t.Minutes}:{t.Seconds}";
+            }
+
+            if (value is int i)
+            {
+                var t = TimeSpan.FromMilliseconds(i);
+                return $"{t.Minutes}:{t.Seconds}";
+            }
+
+            if (value is long l)
+            {
+                var t = TimeSpan.FromMilliseconds(l);
+                return t.ToString("mm':'ss");
+            }
+
+            return string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

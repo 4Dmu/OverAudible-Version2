@@ -120,6 +120,12 @@ namespace OverAudible.ViewModels
             if (UseOfflineMode)
             {
                 var l = await _dataService.GetAll();
+
+                foreach (var item in l)
+                {
+                    item.ProductImages.The500 = new Uri(Constants.DownloadFolder + $@"\{item.Asin}\{item.Asin}_Cover.jpg");
+                }
+
                 Library.AddRange(l);
             }
 
