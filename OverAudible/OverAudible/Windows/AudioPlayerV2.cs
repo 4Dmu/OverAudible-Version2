@@ -164,7 +164,7 @@ namespace OverAudible.Windows
         {
             var c = Playlist.GetTotalTimeUpToCurrentReader().Add(Playlist.GetCurrentPosition());
             var add = (int)(c.Add(amount).TotalMilliseconds / 1000);
-            var sub = (int)(Playlist.GetCurrentPosition().Subtract(amount).TotalMilliseconds / 1000);
+            var sub = (int)(c.Subtract(amount).TotalMilliseconds / 1000);
             var total = (int)(TotalUpToCurrentChapterMillieseconds() / 1000);
 
             if (add >= total && direction == Direction.Forward)
@@ -173,7 +173,7 @@ namespace OverAudible.Windows
                 return;
             }
 
-            if (sub <= CurrentChapter.StartOffsetMs && direction == Direction.Backward)
+            if (sub <= GetSeconds(CurrentChapter.StartOffsetMs) && direction == Direction.Backward)
             {
                 ChangeChapter(-1);
                 return;

@@ -415,13 +415,10 @@ namespace OverAudible.Windows
                 _outputDevice.Play();
         }
 
-
         public TimeSpan GetCurrentPosition()
         {
             return _readers[currentReader].CurrentTime;
         }
-
-        
 
         public TimeSpan GetCurrentReaderTotalTime()
         {
