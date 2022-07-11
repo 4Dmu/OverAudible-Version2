@@ -46,13 +46,13 @@ namespace OverAudible.Windows
         public static readonly DependencyProperty MediaProperty =
             DependencyProperty.Register("Media", typeof(ImageSource), typeof(Player));
 
-        public AudioPlayer AudioPlayer
+        public AudioPlayerV2 AudioPlayer
         {
-            get { return (AudioPlayer)GetValue(AudioPlayerProperty); }
+            get { return (AudioPlayerV2)GetValue(AudioPlayerProperty); }
             set { SetValue(AudioPlayerProperty, value); }
         }
         public static readonly DependencyProperty AudioPlayerProperty =
-            DependencyProperty.Register("AudioPlayer", typeof(AudioPlayer), typeof(Player));
+            DependencyProperty.Register("AudioPlayer", typeof(AudioPlayerV2), typeof(Player));
 
         public bool  ShowChapters
         {
@@ -122,11 +122,10 @@ namespace OverAudible.Windows
 
             Book = book;
 
-            AudioPlayer = new AudioPlayer(data, Constants.DownloadFolder + @"\" + Book.Asin);
-            AudioPlayer.TimerTick += OnTimerTick;
+            AudioPlayer = new AudioPlayerV2(data, Constants.DownloadFolder + @"\" + Book.Asin);
+            AudioPlayer.TimerTicked += OnTimerTick;
             AudioPlayer.ChapterChanged += OnChapterChanged;
-            AudioPlayer.SkippedBack += OnSkipBack;
-            AudioPlayer.SkippedForward += OnSkipForward;
+            AudioPlayer.Skipped += OnSkiped;
             AudioPlayer.EndOfFileReached += OnEndOfFile;
 
             Binding binding = new();
@@ -140,6 +139,14 @@ namespace OverAudible.Windows
 
         }
 
+        private void OnSkiped(TimeSpan obj)
+        {
+            synchronizationContext.Post(o =>
+            {
+                sldr.Value = (int)AudioPlayer.EllapsedTime;
+            }, null);
+        }
+
         private void OnEndOfFile()
         {
             synchronizationContext.Post(o =>
@@ -148,21 +155,6 @@ namespace OverAudible.Windows
             }, null);
         }
 
-        private void OnSkipForward()
-        {
-            synchronizationContext.Post(o =>
-            {
-                sldr.Value = (int)AudioPlayer.EllapsedTime;
-            }, null);
-
-        }
-        private void OnSkipBack()
-        {
-            synchronizationContext.Post(o =>
-            {
-                sldr.Value = (int)AudioPlayer.EllapsedTime;
-            }, null);
-        }
 
         private void OnChapterChanged(AudibleApi.Common.Chapter obj)
         {
@@ -207,26 +199,19 @@ namespace OverAudible.Windows
 
         private void Rewind30_Click(object sender, MouseButtonEventArgs e)
         {
-            AudioPlayer.SkipBack(TimeSpan.FromSeconds(30));
+            AudioPlayer.Skip(TimeSpan.FromSeconds(30), AudioPlayerV2.Direction.Backward);
         }
 
         private void FastForward30_Click(object sender, MouseButtonEventArgs e)
         {
-            AudioPlayer.SkipForward(TimeSpan.FromSeconds(30));
+            AudioPlayer.Skip(TimeSpan.FromSeconds(30),AudioPlayerV2.Direction.Forward);
         }
 
         private void PlayPause_Click(object sender, MouseButtonEventArgs e)
         {
+
             if (sender is MaterialDesignThemes.Wpf.PackIcon icon)
             {
-                if (AudioPlayer.IsAtEndOfFile)
-                {
-                    AudioPlayer.ChangeChapter(AudioPlayer.ContentMetadata.ChapterInfo.Chapters[0]);
-                    AudioPlayer.Play();
-                    icon.Kind = MaterialDesignThemes.Wpf.PackIconKind.PauseCircleFilled;
-                    AudioPlayer.IsAtEndOfFile = false;
-                    return;
-                }
 
                 if (AudioPlayer.IsPlaying)
                 {
@@ -247,15 +232,28 @@ namespace OverAudible.Windows
         {
             this.dragStarted = false;
             int i;
+            /*
+            if (sldr.Value == sldr.Maximum)
+            {
+                AudioPlayer.ChangeChapter(1);
+                return;
+            }    
+            if (sldr.Value == sldr.Minimum)
+            {
+                AudioPlayer.ChangeChapter(-1);
+                return;
+            }
+            */
+
             if (oldValue < sldr.Value)
             {
                 i = (int)(sldr.Value - oldValue);
-                AudioPlayer.SkipForward(TimeSpan.FromSeconds(i));
+                AudioPlayer.Skip(TimeSpan.FromSeconds(i), AudioPlayerV2.Direction.Forward);
             }
             if (sldr.Value < oldValue)
             {
                 i = (int)(oldValue - sldr.Value);
-                AudioPlayer.SkipBack(TimeSpan.FromSeconds(i));
+                AudioPlayer.Skip(TimeSpan.FromSeconds(i), AudioPlayerV2.Direction.Backward);
             }
         }
 
@@ -296,7 +294,7 @@ namespace OverAudible.Windows
                 {
                     if (child is TextBlock t)
                     {
-                        var c = AudioPlayer.ContentMetadata.ChapterInfo.Chapters.FirstOrDefault(x => x.Title == t.Text);
+                        var c = AudioPlayer._contentMetadata.ChapterInfo.Chapters.FirstOrDefault(x => x.Title == t.Text);
 
                         if (c != null)
                         {

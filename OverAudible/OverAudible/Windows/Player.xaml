@@ -110,7 +110,7 @@
 
                 <Grid Visibility="{Binding ShowChapters,ElementName=prnt, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ScrollViewer Margin="0,20,0,0">
-                        <ItemsControl ItemsSource="{Binding AudioPlayer.ContentMetadata.ChapterInfo.Chapters,ElementName=prnt}">
+                        <ItemsControl ItemsSource="{Binding AudioPlayer._contentMetadata.ChapterInfo.Chapters,ElementName=prnt}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type api:Chapter}">
                                     <Grid Background="Transparent" MouseEnter="ChapterInstance_MouseEnter" MouseLeave="ChapterInstance_MouseLeave" MouseLeftButtonDown="ChapterInstance_MouseLeftButtonDown">

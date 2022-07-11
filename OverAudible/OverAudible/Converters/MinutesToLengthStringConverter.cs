@@ -97,7 +97,7 @@ namespace OverAudible.Converters
             if (value is long l)
             {
                 var t = TimeSpan.FromMilliseconds(l);
-                return t.ToString("mm':'ss");
+                return t.ToString("hh':'mm':'ss");
             }
 
             return string.Empty;

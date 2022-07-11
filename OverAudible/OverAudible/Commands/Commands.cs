@@ -16,6 +16,8 @@ using OverAudible.DownloadQueue;
 using System.Windows.Controls;
 using System.Threading;
 using OverAudible.Views;
+using OverAudible.Windows;
+using System.Diagnostics;
 
 namespace OverAudible.Commands
 {
@@ -105,13 +107,35 @@ namespace OverAudible.Commands
     [Inject(InjectionType.Transient)]
     public class PlayCommand : AsyncCommandBase
     {
+        private readonly IDataService<Item> _dataService;
+
+        public PlayCommand(IDataService<Item> dataService)
+        {
+            _dataService = dataService;
+        }
+
         public async override Task ExecuteAsync(object paramater)
         {
             await Task.Delay(1);
 
             if (paramater is Item item)
             {
+                if (!item.ActualIsDownloaded)
+                {
+                    MessageBox.Show(Shell.Current, "Streaming is not yet supported, book must be downloaded before playing", "Alert");
+                    return;
+                }
 
+                try
+                {
+                    Player player = new(_dataService, item);
+                    player.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("There was an error playing the audio file, please delete and try again.");
+                    Debug.WriteLine(ex);
+                }
             }
         }
     }

@@ -84,7 +84,7 @@ namespace OverAudible
 
             Player p = new(_host.Services.GetRequiredService<IDataService<Item>>(), new Item
             {
-                Asin = "B07CJ4C449",
+                Asin = "B09V1XJ949",
                 Title = "Random"
             });
             p.ShowDialog();
