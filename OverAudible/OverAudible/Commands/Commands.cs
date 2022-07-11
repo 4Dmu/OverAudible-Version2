@@ -46,6 +46,7 @@ namespace OverAudible.Commands
             }
         }
     }
+
     
     [Inject(InjectionType.Transient)]
     public class AddToWishlistCommand : AsyncCommandBase
@@ -77,6 +78,7 @@ namespace OverAudible.Commands
         }
     }
 
+
     [Inject(InjectionType.Transient)]
     public class RemoveFromWishlistCommand : AsyncCommandBase
     {
@@ -104,6 +106,7 @@ namespace OverAudible.Commands
         }
     }
 
+
     [Inject(InjectionType.Transient)]
     public class PlayCommand : AsyncCommandBase
     {
@@ -122,7 +125,7 @@ namespace OverAudible.Commands
             {
                 if (!item.ActualIsDownloaded)
                 {
-                    MessageBox.Show(Shell.Current, "Streaming is not yet supported, book must be downloaded before playing", "Alert");
+                    MessageBox.Show(Shell.Current, "Streaming is not yet supported, book must be downloaded before playing", "Alert", MessageBoxButton.OK);
                     return;
                 }
 
@@ -133,12 +136,13 @@ namespace OverAudible.Commands
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("There was an error playing the audio file, please delete and try again.");
+                    MessageBox.Show("There was an error playing the audio file, please delete and try again.", "Alert", MessageBoxButton.OK);
                     Debug.WriteLine(ex);
                 }
             }
         }
     }
+
 
     [Inject(InjectionType.Transient)]
     public class DownloadCommand : AsyncCommandBase
@@ -250,6 +254,7 @@ namespace OverAudible.Commands
 
     }
 
+
     [Inject(InjectionType.Transient)]
     public class PlaySampleCommand : AsyncCommandBase
     {
@@ -272,6 +277,7 @@ namespace OverAudible.Commands
         }
     }
 
+
     [Inject(InjectionType.Transient)]
     public class StopSampleCommand : AsyncCommandBase
     {
@@ -289,6 +295,7 @@ namespace OverAudible.Commands
             _mediaPlayer.Close();
         }
     }
+
 
     [Inject(InjectionType.Transient)]
     public class StandardCommands
