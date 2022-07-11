@@ -82,13 +82,6 @@ namespace OverAudible
 
             Constants.DownloadFolder.EnsureFolderExists();
 
-            Player p = new(_host.Services.GetRequiredService<IDataService<Item>>(), new Item
-            {
-                Asin = "B09V1XJ949",
-                Title = "Random"
-            });
-            p.ShowDialog();
-
             if (AppExtensions.CheckForInternetConnection())
             {
                 MainWindow = new Shell()
