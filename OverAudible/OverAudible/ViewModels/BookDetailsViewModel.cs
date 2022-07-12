@@ -10,6 +10,7 @@ using OverAudible.Models;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ShellUI.Controls;
+using OverAudible.Commands;
 
 namespace OverAudible.ViewModels
 {
@@ -17,52 +18,55 @@ namespace OverAudible.ViewModels
     [QueryProperty("Item", "ItemParam")]
     public partial class BookDetailsViewModel : ViewModelBase
     {
+        public StandardCommands StandardCommands { get; }
+
         [ObservableProperty]
         Item item;
 
-        public BookDetailsViewModel()
+        public BookDetailsViewModel(StandardCommands commands)
         {
-            
+            StandardCommands = commands;
         }
+
 
         [RelayCommand]
-        void AddToWishlist()
+        void AddToCollection(Item item)
         {
 
         }
-
-        [RelayCommand]
-        void RemoveFromWishlist()
-        {
-
-        }
-
-        [RelayCommand]
-        void AddToCollection()
-        {
-
-        }
-
-        [RelayCommand]
-        void Play()
-        {
-            
-        }
+        
 
         [RelayCommand]
         async Task MoreOptions()
         {
-            string result = await Shell.Current.CurrentPage.DisplayActionSheetAsync("More Options", "Cancel", null, 
-                "Purchase", 
-                "Add to Wishlist", 
-                "Write a review");
+            if (Item.IsInLibrary)
+            {
+                if (Item.ActualIsDownloaded)
+                {
+                    string result = await Shell.Current.CurrentPage.DisplayActionSheetAsync("More Options", "Cancel", null,
+                    "Play",
+                    "Delete",
+                    "Add to Collection",
+                    "Write a review");
+                }
+                else
+                {
+                    string result = await Shell.Current.CurrentPage.DisplayActionSheetAsync("More Options", "Cancel", null,
+                   "Download",
+                   "Add to Collection",
+                   "Write a review");
+                }
+            }
+            else
+            {
+                string result = await Shell.Current.CurrentPage.DisplayActionSheetAsync("More Options", "Cancel", null,
+                   "Add to cart",
+                   "Add to Wishlist");
+            }
+           
         }
 
-        [RelayCommand]
-        void Purchase()
-        {
-
-        }
+        
 
     }
 }

@@ -61,16 +61,16 @@
             <StackPanel Grid.Column="2" VerticalAlignment="Center">
                 <Button Content="Play"  
                         Height="30" Margin="5" Visibility="{Binding Item.IsInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Command="{Binding PlayCommand}"/>
+                        Command="{Binding StandardCommands.PlayCommand}" CommandParameter="{Binding Item}"/>
                 <Button Content="Add to Collection"  
                         Height="30" Margin="5" Visibility="{Binding Item.IsInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Command="{Binding AddToCollectionCommand}"/>
-                <Button Content="Purchase"  
+                        Command="{Binding AddToCollectionCommand}" CommandParameter="{Binding Item}"/>
+                <Button Content="Add to cart"  
                         Height="30" Margin="5" Visibility="{Binding Item.IsNotInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Command="{Binding PurchaseCommand}"/>
+                        Command="{Binding StandardCommands.AddToCartCommand}" CommandParameter="{Binding Item}"/>
                 <Button Content="Add to Wishlist"  
                         Height="30" Margin="5" 
-                        Command="{Binding AddToWishlistCommand}">
+                        Command="{Binding StandardCommands.AddToWishlistCommand}" CommandParameter="{Binding Item}">
                     <!--="{Binding Item.IsNotInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"> -->
                     <Button.Visibility>
                         <MultiBinding Converter="{StaticResource AllBoolsToVisibilityConverter}">
@@ -81,7 +81,7 @@
                 </Button>
                 <Button Content="Remove from Wishlist"  
                         Height="30" Margin="5"
-                        Command="{Binding RemoveFromWishlistCommand}">
+                        Command="{Binding StandardCommands.RemoveFromWishlistCommand}" CommandParameter="{Binding Item}">
                     <Button.Visibility>
                         <MultiBinding Converter="{StaticResource AllBoolsToVisibilityConverter}">
                             <Binding Path="Item.IsNotInLibrary" />
@@ -90,7 +90,7 @@
                     </Button.Visibility>
                 </Button>
                 <Button Content="More Options"  
-                        Height="30" Margin="5" Command="{Binding MoreOptionsCommand}"/>
+                        Height="30" Margin="5" Command="{Binding MoreOptionsCommand}" CommandParameter="{Binding Item}"/>
                 <TextBlock Text="{Binding Item.Sku}"/>
             </StackPanel>
 
