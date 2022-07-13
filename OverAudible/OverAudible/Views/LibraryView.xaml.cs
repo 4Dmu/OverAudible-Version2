@@ -20,7 +20,7 @@ using OverAudible.API;
 
 namespace OverAudible.Views
 {
-    [Inject(InjectionType.Transient)]
+    [Inject(InjectionType.Singleton)]
     public partial class LibraryView : ShellPage
     {
         public LibraryViewModel viewModel => this.DataContext as LibraryViewModel;

@@ -18,4 +18,12 @@ namespace OverAudible.Models.DTOs
         public string ContentMetadataJson { get; set; }
         
     }
+
+    public class NoMetaItemDTO
+    {
+        [Key]
+        public string Asin { get; set; }
+
+        public string Item { get; set; }
+    }
 }

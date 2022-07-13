@@ -18,6 +18,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0-preview.5.22301.12" />
     <PackageReference Include="NAudio" Version="2.1.0" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
     <PackageReference Include="ShellUI" Version="1.0.6" />
     <PackageReference Include="ShellUI.Theme" Version="1.0.0" />
@@ -33,6 +34,16 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ProgressDialogEx">
+      <HintPath>..\..\..\..\..\..\wpf-resources\CustomControls\ProgressDialogEx\ProgressDialogEx\bin\Debug\ProgressDialogEx.exe</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

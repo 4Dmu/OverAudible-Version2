@@ -53,6 +53,7 @@ namespace OverAudible
                     services.AddDbContext<MainDbContext>(configureDbContext);
                     services.AddSingleton<MainDbContextFactory>(new MainDbContextFactory(configureDbContext));
                     services.AddSingleton<IDataService<Item>, DataService>();
+                    services.AddSingleton<LibraryDataService>();
                     services.AddSingleton<MediaPlayer>();
                     services.AddSingleton<IDownloadQueue, BlockingCollectionQueue>();
                     services.AutoRegisterDependencies(this.GetType().Assembly.GetTypes());

@@ -79,6 +79,26 @@ namespace OverAudible.API
 
             return Shell.DependencyService.ServiceProvider.GetRequiredService<IMapper>().Map<List<Item>>(library);
         }
+
+        public async Task<List<Item>> GetLibraryPartsAsync(int pagNumber)
+        {
+            LibraryOptions options = new();
+            options.NumberOfResultPerPage = 25;
+            options.PageNumber = pagNumber;
+            options.ResponseGroups = LibraryOptions.ResponseGroupOptions.ALL_OPTIONS;
+            var library = await Api.getAllLibraryItemsAsync(options);
+
+            return Shell.DependencyService.ServiceProvider.GetRequiredService<IMapper>().Map<List<Item>>(library);
+        }
+
+        public async Task<int> GetLibraryTotal()
+        {
+            LibraryOptions options = new();
+            options.ResponseGroups = LibraryOptions.ResponseGroupOptions.None;
+            var c = await Api.getAllLibraryJObjectsAsync(options);
+
+            return c.Count;
+        }
         
         public async Task<List<Item>> GetWishlistAsync()
         {

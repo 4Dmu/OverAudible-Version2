@@ -33,6 +33,20 @@ namespace OverAudible.Migrations
 
                     b.ToTable("OfflineLibrary");
                 });
+
+            modelBuilder.Entity("OverAudible.Models.DTOs.NoMetaItemDTO", b =>
+                {
+                    b.Property<string>("Asin")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Item")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Asin");
+
+                    b.ToTable("FullLibrary");
+                });
 #pragma warning restore 612, 618
         }
     }

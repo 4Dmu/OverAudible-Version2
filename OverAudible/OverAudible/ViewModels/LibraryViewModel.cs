@@ -22,7 +22,7 @@ using System.Windows.Media;
 
 namespace OverAudible.ViewModels
 {
-    [Inject(InjectionType.Transient)]
+    [Inject(InjectionType.Singleton)]
     [QueryProperty("UseOfflineMode", "UseOfflineMode")]
     public partial class LibraryViewModel : ViewModelBase
     {
@@ -34,6 +34,8 @@ namespace OverAudible.ViewModels
         public ConcurrentObservableCollection<Collection> Collections { get; set; }
 
         public StandardCommands StandardCommands { get; }
+
+        private int currentPage = 1;
 
         public bool IsPlayingSample { get; set; } = false;
 

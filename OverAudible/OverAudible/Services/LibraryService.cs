@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OverAudible.Models;
+using ShellUI.Controls;
+using OverAudible.Windows;
 
 namespace OverAudible.Services
 {
@@ -13,13 +15,15 @@ namespace OverAudible.Services
     public class LibraryService
     {
         private readonly Lazy<Task> initLazy;
+        private readonly LibraryDataService _libraryDataService;
 
         private List<Item> library { get; set; }
         private List<Item> wishlist { get; set; }
         private List<Collection> collections { get; set; }
 
-        public LibraryService()
+        public LibraryService(LibraryDataService libraryDataService)
         {
+            _libraryDataService = libraryDataService;
             initLazy = new Lazy<Task>(InitAsync);
             library = new List<Item>();
             wishlist = new List<Item>();
@@ -30,7 +34,24 @@ namespace OverAudible.Services
         {
             ApiClient apiClient = await ApiClient.GetInstance();
 
-            library = await apiClient.GetLibraryAsync();
+            var l = await _libraryDataService.GetAll();
+            if (l.Count == 0)
+            {
+                library = await ProgressDialog.ShowDialogAsync<List<Item>>("Importing library", "Importing library from server, " +
+                    "as this is your first time it could take quite a while.", async () => await apiClient.GetLibraryAsync());
+                foreach (var item in library)
+                {
+                    await _libraryDataService.Create(item);
+                }
+            }
+            else
+            {
+                library = l;
+            }
+            
+
+            
+
             wishlist = await apiClient.GetWishlistAsync();
             collections = await apiClient.GetCollectionsWithItemsAsync();
         }

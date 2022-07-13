@@ -10,8 +10,8 @@ using OverAudible.DbContexts;
 namespace OverAudible.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20220707135820_added-metadata")]
-    partial class addedmetadata
+    [Migration("20220713104455_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

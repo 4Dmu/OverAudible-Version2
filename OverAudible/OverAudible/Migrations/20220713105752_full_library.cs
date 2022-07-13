@@ -5,13 +5,13 @@
 namespace OverAudible.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class full_library : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "OfflineLibrary",
+                name: "FullLibrary",
                 columns: table => new
                 {
                     Asin = table.Column<string>(type: "TEXT", nullable: false),
@@ -19,7 +19,7 @@ namespace OverAudible.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OfflineLibrary", x => x.Asin);
+                    table.PrimaryKey("PK_FullLibrary", x => x.Asin);
                 });
         }
 
@@ -27,7 +27,7 @@ namespace OverAudible.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OfflineLibrary");
+                name: "FullLibrary");
         }
     }
 }

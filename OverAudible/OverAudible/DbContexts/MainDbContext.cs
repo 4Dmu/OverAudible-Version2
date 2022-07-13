@@ -15,5 +15,8 @@ namespace OverAudible.DbContexts
         }
 
         public DbSet<ItemDTO> OfflineLibrary { get; set; }
+
+        public DbSet<NoMetaItemDTO> FullLibrary { get; set; }
+
     }
 }
