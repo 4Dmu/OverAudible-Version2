@@ -15,7 +15,8 @@
                     Title="Library"
             >
     <Grid>
-        <TabControl>
+        <TabControl x:Name="tabC">
+            
             <TabItem Header="Books" Width="100">
                 <ScrollViewer x:Name="scroll">
                     <behaviours:Interaction.Triggers>
@@ -128,7 +129,14 @@
             </TabItem>
 
             <TabItem Header="Wishlist" Width="100" Visibility="{Binding DontUseOfflineMode, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <ScrollViewer>
+                <ScrollViewer x:Name="scroll2">
+                    <behaviours:Interaction.Triggers>
+                        <behaviours:EventTrigger EventName="ScrollChanged">
+                            <behaviours:InvokeCommandAction 
+                                Command="{Binding WishlistScrollCommand}"
+                                PassEventArgsToCommand="True"/>
+                        </behaviours:EventTrigger>
+                    </behaviours:Interaction.Triggers>
                     <ItemsControl ItemsSource="{Binding Wishlist}" Margin="0,0,0,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:Item}">

@@ -7,11 +7,19 @@
               xmlns:shellUi="clr-namespace:ShellUI;assembly=ShellUI"
               xmlns:controls="clr-namespace:ShellUI.Controls;assembly=ShellUI" xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
                     xmlns:models="clr-namespace:OverAudible.Models"
+                    xmlns:behaviours="http://schemas.microsoft.com/xaml/behaviors"
                     mc:Ignorable="d" 
                     Title="{Binding Collection.Title}"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ScrollViewer>
+        <ScrollViewer >
+            <behaviours:Interaction.Triggers>
+                <behaviours:EventTrigger EventName="ScrollChanged">
+                    <behaviours:InvokeCommandAction 
+                                Command="{Binding BooksScrollCommand}"
+                                PassEventArgsToCommand="True"/>
+                </behaviours:EventTrigger>
+            </behaviours:Interaction.Triggers>
             <ItemsControl ItemsSource="{Binding Books}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Item}">

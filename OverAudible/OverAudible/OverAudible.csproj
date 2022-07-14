@@ -21,7 +21,7 @@
     <PackageReference Include="NAudio" Version="2.1.0" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
-    <PackageReference Include="ShellUI" Version="1.0.6" />
+    <PackageReference Include="ShellUI" Version="1.0.7" />
     <PackageReference Include="ShellUI.Theme" Version="1.0.0" />
     <PackageReference Include="syncfusion.ui.wpf.net" Version="20.1.0.47" />
   </ItemGroup>

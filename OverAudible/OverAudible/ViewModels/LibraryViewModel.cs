@@ -142,6 +142,42 @@ namespace OverAudible.ViewModels
         }
 
         [RelayCommand]
+        void WishlistScroll(RoutedEventArgs args)
+        {
+            if (IsBusy)
+                return;
+            if (args.Source is ScrollViewer sv)
+            {
+
+                if (sv.VerticalOffset > sv.ScrollableHeight - bookCardHeightValue
+                    && !Wishlist.Contains(TotalWishlist.Last()))
+                {
+                    var itemToAdd = TotalWishlist[TotalWishlist.IndexOf(Wishlist.Last()) + 1];
+                    var itemToRemove = TotalWishlist[TotalWishlist.IndexOf(Wishlist.First())];
+
+                    Wishlist.Remove(itemToRemove);
+                    Wishlist.Add(itemToAdd);
+                    sv.ScrollToVerticalOffset(sv.ScrollableHeight - bookCardHeightValue);
+                }
+                else if (sv.VerticalOffset < bookCardHeightValue
+                        && !Wishlist.Contains(TotalWishlist.First()))
+                {
+                    var first = Wishlist.First();
+                    int index = TotalWishlist.IndexOf(first);
+                    index--;
+                    var last = Wishlist.Last();
+                    int lindex = TotalWishlist.IndexOf(last);
+                    var itemToAdd = TotalWishlist[index];
+                    var itemToRemove = TotalWishlist[lindex];
+
+                    Wishlist.Remove(itemToRemove);
+                    Wishlist.Insert(0, itemToAdd);
+                    sv.ScrollToVerticalOffset(bookCardHeightValue);
+                }
+            }
+        }
+
+        [RelayCommand]
         void LibraryScroll(RoutedEventArgs args)
         {
             if (IsBusy)
@@ -175,39 +211,41 @@ namespace OverAudible.ViewModels
                     sv.ScrollToVerticalOffset(bookCardHeightValue);
                 }
 
+                #region ok
                 /*if (sv.VerticalOffset > sv.ScrollableHeight - bookCardHeightValue 
-                    && !Library.Contains(TotalLibrary.Last()))
-                {
-                    var firstItem = Library.Last();
+                            && !Library.Contains(TotalLibrary.Last()))
+                        {
+                            var firstItem = Library.Last();
 
 
-                    List<Item> items;
+                            List<Item> items;
 
-                    if (TotalLibrary.CanGetRange(TotalLibrary.IndexOf(firstItem), 25))
-                    {
-                        items = TotalLibrary.GetRange(TotalLibrary.IndexOf(firstItem), 25);
-                    }
-                    else
-                    {
-                        items = TotalLibrary.Count == TotalLibrary.IndexOf(firstItem) + 1
-                            ? new()
-                            : TotalLibrary.GetRange(TotalLibrary.IndexOf(firstItem), TotalLibrary.Count - TotalLibrary.IndexOf(firstItem);
-                    }
+                            if (TotalLibrary.CanGetRange(TotalLibrary.IndexOf(firstItem), 25))
+                            {
+                                items = TotalLibrary.GetRange(TotalLibrary.IndexOf(firstItem), 25);
+                            }
+                            else
+                            {
+                                items = TotalLibrary.Count == TotalLibrary.IndexOf(firstItem) + 1
+                                    ? new()
+                                    : TotalLibrary.GetRange(TotalLibrary.IndexOf(firstItem), TotalLibrary.Count - TotalLibrary.IndexOf(firstItem);
+                            }
 
 
-                    if (items.Count == 0)
-                        return;
+                            if (items.Count == 0)
+                                return;
 
-                    Library.Clear();
-                    Library.AddRange(items);
+                            Library.Clear();
+                            Library.AddRange(items);
 
-                    sv.ScrollToTop();
-                }
-                else if (sv.VerticalOffset < bookCardHeightValue 
-                    && !Library.Contains(TotalLibrary.First()))
-                {
+                            sv.ScrollToTop();
+                        }
+                        else if (sv.VerticalOffset < bookCardHeightValue 
+                            && !Library.Contains(TotalLibrary.First()))
+                        {
 
-                }*/
+                        }*/ 
+                #endregion
             }
         }
 
@@ -233,6 +271,7 @@ namespace OverAudible.ViewModels
                 try
                 {
                     IsBusy = true;
+                    Shell.Current.IsWindowLocked = true;
 
                     var l = await _libraryService.GetLibraryAsync();
                     var w = await _libraryService.GetWishlistAsync();
@@ -290,6 +329,7 @@ namespace OverAudible.ViewModels
                 finally
                 {
                     IsBusy = false;
+                    Shell.Current.IsWindowLocked = false;
                 }
             }
 

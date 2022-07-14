@@ -223,17 +223,36 @@ namespace OverAudible.Views
 
         private void GlobalKeyDown(object sender, KeyEventArgs e)
         {
-           
-            if (e.Key == Key.Down)
+
+            if (Shell.Current.CurrentPage is not LibraryView)
+                return;
+
+            if (tabC.SelectedIndex == 0)
             {
-                scroll.ScrollToVerticalOffset(scroll.VerticalOffset + 30);
+                if (e.Key == Key.Down)
+                {
+                    scroll.ScrollToVerticalOffset(scroll.VerticalOffset + 30);
+                }
+
+                if (e.Key == Key.Up)
+                {
+                    scroll.ScrollToVerticalOffset(scroll.VerticalOffset - 30);
+                }
             }
 
-            if (e.Key == Key.Up)
+            if (tabC.SelectedIndex == 1)
             {
-                scroll.ScrollToVerticalOffset(scroll.VerticalOffset - 30);
+                if (e.Key == Key.Down)
+                {
+                    scroll2.ScrollToVerticalOffset(scroll2.VerticalOffset + 30);
+                }
+
+                if (e.Key == Key.Up)
+                {
+                    scroll2.ScrollToVerticalOffset(scroll2.VerticalOffset - 30);
+                }
             }
-            
+
         }
     }
 
