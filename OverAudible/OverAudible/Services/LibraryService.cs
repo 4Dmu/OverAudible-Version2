@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using OverAudible.Models;
 using ShellUI.Controls;
 using OverAudible.Windows;
+using OverAudible.EventMessages;
 
 namespace OverAudible.Services
 {
@@ -30,6 +31,35 @@ namespace OverAudible.Services
             collections = new List<Collection>();
         }
 
+        private async Task SyncLibraryAsync()
+        {
+            ApiClient apiClient = await ApiClient.GetInstance();
+            var l = await apiClient.GetLibraryAsync();
+            var dl = await _libraryDataService.GetAll();
+
+            if (dl.Count >= l.Count)
+            {
+                return;
+            }
+                
+
+            foreach (var item in l)
+            {
+                if (!dl.Contains(item))
+                {
+                    await _libraryDataService.Create(item);
+                }
+            }
+
+            var lib = await _libraryDataService.GetAll();
+            library = lib;
+
+            Shell.Current.EventAggregator.Publish(
+                new RefreshLibraryMessage(new LocalAndServerLibrarySyncedMessage()));
+
+        }
+
+
         private async Task InitAsync()
         {
             ApiClient apiClient = await ApiClient.GetInstance();
@@ -47,10 +77,8 @@ namespace OverAudible.Services
             else
             {
                 library = l;
+                _  = SyncLibraryAsync();
             }
-            
-
-            
 
             wishlist = await apiClient.GetWishlistAsync();
             collections = await apiClient.GetCollectionsWithItemsAsync();

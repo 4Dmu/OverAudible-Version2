@@ -6,6 +6,7 @@ using OverAudible.Commands;
 using OverAudible.DownloadQueue;
 using OverAudible.EventMessages;
 using OverAudible.Models;
+using OverAudible.Models.Extensions;
 using OverAudible.Services;
 using OverAudible.Views;
 using ShellUI.Attributes;
@@ -18,6 +19,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace OverAudible.ViewModels
@@ -26,9 +29,13 @@ namespace OverAudible.ViewModels
     [QueryProperty("UseOfflineMode", "UseOfflineMode")]
     public partial class LibraryViewModel : ViewModelBase
     {
+        private const int bookCount = 25;
+        private const int bookCardHeightValue = 30;
         private readonly LibraryService _libraryService;
         private readonly IDataService<Item> _dataService;
 
+
+        public List<Item> TotalLibrary { get; set; }
         public ConcurrentObservableCollection<Item> Library { get; set; }
         public ConcurrentObservableCollection<Item> Wishlist { get; set; }
         public ConcurrentObservableCollection<Collection> Collections { get; set; }
@@ -49,6 +56,7 @@ namespace OverAudible.ViewModels
         {
             _libraryService = libraryService;
             StandardCommands = standardCommands;
+            TotalLibrary = new();
             Library = new();
             Wishlist = new();
             Collections = new();
@@ -60,7 +68,7 @@ namespace OverAudible.ViewModels
             _dataService = dataService;
         }
 
-        private void OnLibraryRefreshMessageReceived(RefreshLibraryMessage obj)
+        private async void OnLibraryRefreshMessageReceived(RefreshLibraryMessage obj)
         {
             if (obj.InnerMessage is NewCollectionMessage msg)
             {
@@ -74,6 +82,13 @@ namespace OverAudible.ViewModels
                 if (msg2.Action == WishlistAction.Removed)
                     Wishlist.Remove(msg2.Item);
             }    
+
+            if (obj.InnerMessage is LocalAndServerLibrarySyncedMessage msg3)
+            {
+                Library.Clear();
+                var l = await _libraryService.GetLibraryAsync();
+                Library.AddRange(l);
+            }
         }
 
         [RelayCommand]
@@ -117,6 +132,76 @@ namespace OverAudible.ViewModels
             }
         }
 
+        [RelayCommand]
+        void LibraryScroll(RoutedEventArgs args)
+        {
+            if (IsBusy)
+                return;
+            if (args.Source is ScrollViewer sv)
+            {
+
+                if (sv.VerticalOffset > sv.ScrollableHeight - bookCardHeightValue
+                    && !Library.Contains(TotalLibrary.Last()))
+                {
+                    var itemToAdd = TotalLibrary[TotalLibrary.IndexOf(Library.Last()) + 1];
+                    var itemToRemove = TotalLibrary[TotalLibrary.IndexOf(Library.First())];
+
+                    Library.Remove(itemToRemove);
+                    Library.Add(itemToAdd);
+                    sv.ScrollToVerticalOffset(sv.ScrollableHeight - bookCardHeightValue);
+                }
+                else if (sv.VerticalOffset < bookCardHeightValue
+                        && !Library.Contains(TotalLibrary.First()))
+                {
+                    var first = Library.First();
+                    int index = TotalLibrary.IndexOf(first);
+                    index--;
+                    var last = Library.Last();
+                    int lindex = TotalLibrary.IndexOf(last);
+                    var itemToAdd = TotalLibrary[index];
+                    var itemToRemove = TotalLibrary[lindex];
+
+                    Library.Remove(itemToRemove);
+                    Library.Insert(0, itemToAdd);
+                    sv.ScrollToVerticalOffset(bookCardHeightValue);
+                }
+
+                /*if (sv.VerticalOffset > sv.ScrollableHeight - bookCardHeightValue 
+                    && !Library.Contains(TotalLibrary.Last()))
+                {
+                    var firstItem = Library.Last();
+
+
+                    List<Item> items;
+
+                    if (TotalLibrary.CanGetRange(TotalLibrary.IndexOf(firstItem), 25))
+                    {
+                        items = TotalLibrary.GetRange(TotalLibrary.IndexOf(firstItem), 25);
+                    }
+                    else
+                    {
+                        items = TotalLibrary.Count == TotalLibrary.IndexOf(firstItem) + 1
+                            ? new()
+                            : TotalLibrary.GetRange(TotalLibrary.IndexOf(firstItem), TotalLibrary.Count - TotalLibrary.IndexOf(firstItem);
+                    }
+
+
+                    if (items.Count == 0)
+                        return;
+
+                    Library.Clear();
+                    Library.AddRange(items);
+
+                    sv.ScrollToTop();
+                }
+                else if (sv.VerticalOffset < bookCardHeightValue 
+                    && !Library.Contains(TotalLibrary.First()))
+                {
+
+                }*/
+            }
+        }
+
         public async Task LoadAsync()
         {
             if (UseOfflineMode)
@@ -146,7 +231,10 @@ namespace OverAudible.ViewModels
 
                     if (Library.Count > 0)
                         Library.Clear();
-                    Library.AddRange(l);
+                    if (TotalLibrary.Count > 0)
+                        TotalLibrary.Clear();
+                    TotalLibrary.AddRange(l);
+                    Library.AddRange(TotalLibrary.Count > bookCount ? TotalLibrary.GetRange(0, bookCount) : TotalLibrary);
 
                     if (Wishlist.Count > 0)
                         Wishlist.Clear();

@@ -32,6 +32,11 @@ namespace OverAudible.Views
             this.Loaded += async (s, e) =>
             {
                 await viewModel.LoadAsync();
+                Shell.Current.KeyDown += GlobalKeyDown;
+            };
+            this.Unloaded += (s, e) =>
+            {
+                Shell.Current.KeyDown -= GlobalKeyDown;
             };
         }
 
@@ -216,7 +221,20 @@ namespace OverAudible.Views
             }
         }
 
-        
+        private void GlobalKeyDown(object sender, KeyEventArgs e)
+        {
+           
+            if (e.Key == Key.Down)
+            {
+                scroll.ScrollToVerticalOffset(scroll.VerticalOffset + 30);
+            }
+
+            if (e.Key == Key.Up)
+            {
+                scroll.ScrollToVerticalOffset(scroll.VerticalOffset - 30);
+            }
+            
+        }
     }
 
 
