@@ -37,6 +37,7 @@ namespace OverAudible.ViewModels
 
         public List<Item> TotalLibrary { get; set; }
         public ConcurrentObservableCollection<Item> Library { get; set; }
+        public List<Item> TotalWishlist { get; set; }
         public ConcurrentObservableCollection<Item> Wishlist { get; set; }
         public ConcurrentObservableCollection<Collection> Collections { get; set; }
 
@@ -58,6 +59,7 @@ namespace OverAudible.ViewModels
             StandardCommands = standardCommands;
             TotalLibrary = new();
             Library = new();
+            TotalWishlist = new();
             Wishlist = new();
             Collections = new();
             Shell.Current.EventAggregator.Subscribe<RefreshLibraryMessage>(OnLibraryRefreshMessageReceived);
@@ -88,6 +90,13 @@ namespace OverAudible.ViewModels
                 Library.Clear();
                 var l = await _libraryService.GetLibraryAsync();
                 Library.AddRange(l);
+            }
+
+            if (obj.InnerMessage is LocalAndServerWishlistSyncedMessage msg4)
+            {
+                Wishlist.Clear();
+                var w = await _libraryService.GetLibraryAsync();
+                Wishlist.AddRange(w);
             }
         }
 
@@ -238,7 +247,10 @@ namespace OverAudible.ViewModels
 
                     if (Wishlist.Count > 0)
                         Wishlist.Clear();
-                    Wishlist.AddRange(w);
+                    if (TotalWishlist.Count > 0)
+                        TotalWishlist.Clear();
+                    TotalWishlist.AddRange(w);
+                    Wishlist.AddRange(TotalWishlist.Count > bookCount ? TotalWishlist.GetRange(0, bookCount) : TotalWishlist);
 
                     if (Collections.Count > 0)
                         Collections.Clear();

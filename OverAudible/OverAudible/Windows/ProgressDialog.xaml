@@ -7,7 +7,9 @@
         xmlns:shell="clr-namespace:ShellUI;assembly=ShellUI"
         Background="{DynamicResource {x:Static shell:Brushes.BackgroundBrush}}"
         mc:Ignorable="d"
-        Height="100" Width="250" x:Name="prnt">
+        WindowStyle="ToolWindow"
+        ResizeMode="NoResize"
+        Height="200" Width="350" x:Name="prnt">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

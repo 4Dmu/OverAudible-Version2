@@ -26,4 +26,12 @@ namespace OverAudible.Models.DTOs
 
         public string Item { get; set; }
     }
+
+    public class CatalogItemDTO
+    {
+        [Key]
+        public string Asin { get; set; }
+
+        public string Item { get; set; }
+    }
 }

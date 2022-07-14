@@ -102,13 +102,36 @@ namespace OverAudible.API
         
         public async Task<List<Item>> GetWishlistAsync()
         {
-            string url = "/1.0/wishlist?sort_by=-DateAdded" + "&" + CatalogOptions.ResponseGroupOptions.ALL_OPTIONS.ToQueryString();
-            var result = await Api.AdHocAuthenticatedGetAsync(url);
-            var obj = await result.Content.ReadAsJObjectAsync();
-            AudibleApi.Common.ProductsDtoV10 dto = AudibleApi.Common.ProductsDtoV10.FromJson(obj.ToString());
+            List<Item> wishlist = new List<Item>();
 
-            return Shell.DependencyService.ServiceProvider.GetRequiredService<IMapper>().Map<List<Item>>(dto.Products.ToList());
+            int page = -1;
+            int itemPerPage = 50;
+
+            while (true)
+            {
+                try
+                {
+                    page++;
+                    string url = "/1.0/wishlist?sort_by=-DateAdded"
+                    + $"&num_results={itemPerPage}" + $"&page={page}"
+                    + "&" + CatalogOptions.ResponseGroupOptions.ALL_OPTIONS.ToQueryString();
+                    var result = await Api.AdHocAuthenticatedGetAsync(url);
+                    var obj = await result.Content.ReadAsJObjectAsync();
+                    AudibleApi.Common.ProductsDtoV10 dto = AudibleApi.Common.ProductsDtoV10.FromJson(obj.ToString());
+
+                    if (dto.Products == null || dto.Products.Length == 0)
+                        break;
+
+                    wishlist.AddRange(Shell.DependencyService.ServiceProvider.GetRequiredService<IMapper>().Map<List<Item>>(dto.Products.ToList()));
+                }
+                catch (Exception ex)
+                {
+                    break;
+                }
+            }
+            return wishlist;
         }
+
 
         public async Task<List<Collection>> GetCollectionsWithItemsAsync()
         {

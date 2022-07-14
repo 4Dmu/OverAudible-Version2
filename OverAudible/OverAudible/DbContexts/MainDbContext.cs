@@ -18,5 +18,7 @@ namespace OverAudible.DbContexts
 
         public DbSet<NoMetaItemDTO> FullLibrary { get; set; }
 
+        public DbSet<CatalogItemDTO> Wishlist { get; set; }
+
     }
 }

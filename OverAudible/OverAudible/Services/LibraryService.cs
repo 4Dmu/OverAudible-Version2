@@ -17,14 +17,16 @@ namespace OverAudible.Services
     {
         private readonly Lazy<Task> initLazy;
         private readonly LibraryDataService _libraryDataService;
+        private readonly WishlistDataService _wishlistDataService;
 
         private List<Item> library { get; set; }
         private List<Item> wishlist { get; set; }
         private List<Collection> collections { get; set; }
 
-        public LibraryService(LibraryDataService libraryDataService)
+        public LibraryService(LibraryDataService libraryDataService, WishlistDataService wishlistDataService)
         {
             _libraryDataService = libraryDataService;
+            _wishlistDataService = wishlistDataService;
             initLazy = new Lazy<Task>(InitAsync);
             library = new List<Item>();
             wishlist = new List<Item>();
@@ -59,6 +61,29 @@ namespace OverAudible.Services
 
         }
 
+        private async Task SyncWishlistAsync()
+        {
+            ApiClient apiClient = await ApiClient.GetInstance();
+            var w = await apiClient.GetWishlistAsync();
+            var dw = await _wishlistDataService.GetAll();
+
+            if (dw.Count >= w.Count)
+            {
+                return;
+            }
+
+            foreach (var item in w)
+            {
+                if (!dw.Contains(item))
+                {
+                    await _wishlistDataService.Create(item);
+                }
+            }
+
+            var wish = await _wishlistDataService.GetAll();
+
+            Shell.Current.EventAggregator.Publish(new RefreshLibraryMessage(new LocalAndServerWishlistSyncedMessage()));
+        }
 
         private async Task InitAsync()
         {
@@ -68,7 +93,7 @@ namespace OverAudible.Services
             if (l.Count == 0)
             {
                 library = await ProgressDialog.ShowDialogAsync<List<Item>>("Importing library", "Importing library from server, " +
-                    "as this is your first time it could take quite a while.", async () => await apiClient.GetLibraryAsync());
+                    " \nas this is your first time it could take quite a while.", async () => await apiClient.GetLibraryAsync());
                 foreach (var item in library)
                 {
                     await _libraryDataService.Create(item);
@@ -80,7 +105,24 @@ namespace OverAudible.Services
                 _  = SyncLibraryAsync();
             }
 
-            wishlist = await apiClient.GetWishlistAsync();
+            var w = await _wishlistDataService.GetAll();
+
+            if (w.Count == 0)
+            {
+                wishlist = await ProgressDialog.ShowDialogAsync<List<Item>>("Importing wishlist", "Importing wishlist from server, " +
+                    "\nas this is your first time it could take quite a while.", async () => await apiClient.GetWishlistAsync());
+                foreach (var item in wishlist)
+                {
+                    await _wishlistDataService.Create(item);
+                }
+            }
+            else
+            {
+                wishlist = w;
+                _ = SyncWishlistAsync();
+            }
+
+
             collections = await apiClient.GetCollectionsWithItemsAsync();
         }
 
