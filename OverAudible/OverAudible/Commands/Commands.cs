@@ -273,6 +273,10 @@ namespace OverAudible.Commands
             {
                 _mediaPlayer.Open(item.SampleUrl);
                 _mediaPlayer.Play();
+                _mediaPlayer.MediaEnded += (s, e) =>
+                {
+                    Shell.Current.EventAggregator.Publish(new SampleStopedMessage(item.Asin));
+                };
             }
         }
     }

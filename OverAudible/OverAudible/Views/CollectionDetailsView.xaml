@@ -7,7 +7,7 @@
               xmlns:shellUi="clr-namespace:ShellUI;assembly=ShellUI"
               xmlns:controls="clr-namespace:ShellUI.Controls;assembly=ShellUI" xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
                     xmlns:models="clr-namespace:OverAudible.Models"
-                    xmlns:behaviours="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:behaviours="http://schemas.microsoft.com/xaml/behaviors" xmlns:mat="http://materialdesigninxaml.net/winfx/xaml/themes"
                     mc:Ignorable="d" 
                     Title="{Binding Collection.Title}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -45,7 +45,7 @@
                                 </Grid>
 
                                 <Button Grid.Row="1" Grid.Column="0" Margin="5" Width="116"
-                                            Content="Sample" Padding="0" />
+                                            Content="Sample" Padding="0" Click="Sample_Click"/>
 
                                 <StackPanel Grid.Column="1" Margin="0,5,0,0">
                                     <TextBlock Text="{Binding Title}" FontSize="15"/>
@@ -71,17 +71,47 @@
 
                                 <StackPanel Grid.Column="2" VerticalAlignment="Center" Grid.RowSpan="2">
                                     <Button Content="Add to Cart"  
-                                                Visibility="{Binding IsNotInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Margin="5"/>
+                                            Visibility="{Binding IsNotInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Margin="5" Click="AddToCart_Click"/>
                                     <Button Content="Add to Wishlist"  
-                                                Visibility="{Binding IsNotInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Margin="5"/>
-                                    <Button Content="Play"  
-                                                Visibility="{Binding IsInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Margin="5"/>
-                                    <Button Content="Download" 
-                                                Visibility="{Binding IsInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Margin="5"/>
+                                                Height="30" Margin="5"  Click="AddToWishlist_Click"
+                                                >
+                                        <!--="{Binding Item.IsNotInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"> -->
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource AllBoolsToVisibilityConverter}">
+                                                <Binding Path="IsNotInLibrary" />
+                                                <Binding Path="IsNotInWishlist" />
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                    </Button>
+                                    <Button Content="Remove from Wishlist"  
+                                                Height="30" Margin="5" Click="RemoveFromWishlist_Click">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource AllBoolsToVisibilityConverter}">
+                                                <Binding Path="IsNotInLibrary" />
+                                                <Binding Path="IsInWishlist" />
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                    </Button>
+                                    <Button Content="Play"  Click="Play_Click"
+                                            Visibility="{Binding IsInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Margin="5"/>
+                                    <Button Content="Download" Click="Download_Click"
+                                            Margin="5">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource BoolsToVisibilityInvertLastBoolConverter}">
+                                                <Binding Path="IsInLibrary" />
+                                                <Binding Path="ActualIsDownloaded" />
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                    </Button>
+                                    <ProgressBar Visibility="Collapsed" Height="20"/>
+                                    <Button Visibility="{Binding ActualIsDownloaded, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="5" Padding="0,5,5,5" IsEnabled="False">
+                                        <StackPanel Orientation="Horizontal">
+                                            <mat:PackIcon Kind="Check" Foreground="{DynamicResource {x:Static shellUi:Brushes.AccentBrush}}" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Downloaded"/>
+                                        </StackPanel>
+                                    </Button>
                                 </StackPanel>
 
                             </Grid>

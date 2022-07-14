@@ -12,6 +12,9 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
 using System.Windows.Controls;
+using OverAudible.Commands;
+using ShellUI.Controls;
+using OverAudible.EventMessages;
 
 namespace OverAudible.ViewModels
 {
@@ -30,9 +33,15 @@ namespace OverAudible.ViewModels
 
         public List<Item> TotalBooks { get; set; }
 
-        public CollectionDetailsViewModel(LibraryService libraryService)
+        public StandardCommands StandardCommands { get; }
+
+        public bool IsPlayingSample { get; set; } = false;
+
+        public CollectionDetailsViewModel(LibraryService libraryService, StandardCommands standardCommands)
         {
             _libraryService = libraryService;
+            StandardCommands = standardCommands;
+            Shell.Current.EventAggregator.Subscribe<SampleStopedMessage>(OnSampleStoped);
             this.PropertyChanged += async (s, e) =>
             {
                 if (e.PropertyName == nameof(Collection) && Books == null)
@@ -44,6 +53,14 @@ namespace OverAudible.ViewModels
                     Books.AddRange(TotalBooks.Count > bookCount ? TotalBooks.GetRange(0, bookCount) : TotalBooks);
                 }
             };
+        }
+
+        private void OnSampleStoped(SampleStopedMessage obj)
+        {
+            if (IsPlayingSample)
+            {
+                SampleCommand.Execute(Books?.FirstOrDefault(x => x.Asin == obj.Asin));
+            }
         }
 
         [RelayCommand]
@@ -79,6 +96,21 @@ namespace OverAudible.ViewModels
                     Books.Insert(0, itemToAdd);
                     sv.ScrollToVerticalOffset(bookCardHeightValue);
                 }
+            }
+        }
+
+        [RelayCommand]
+        void Sample(Item item)
+        {
+            if (IsPlayingSample)
+            {
+                StandardCommands.StopSampleCommand.Execute(null);
+                IsPlayingSample = false;
+            }
+            else
+            {
+                IsPlayingSample = true;
+                StandardCommands.PlaySampleCommand.Execute(item);
             }
         }
     }
