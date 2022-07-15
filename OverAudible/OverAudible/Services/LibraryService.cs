@@ -124,6 +124,8 @@ namespace OverAudible.Services
 
 
             collections = await apiClient.GetCollectionsWithItemsAsync();
+
+            
         }
 
         public async Task<List<Item>> GetLibraryAsync()

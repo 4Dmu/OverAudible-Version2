@@ -30,13 +30,6 @@ namespace OverAudible.ViewModels
 
 
         [RelayCommand]
-        void AddToCollection(Item item)
-        {
-
-        }
-        
-
-        [RelayCommand]
         async Task MoreOptions()
         {
             if (Item.IsInLibrary)
@@ -48,6 +41,22 @@ namespace OverAudible.ViewModels
                     "Delete",
                     "Add to Collection",
                     "Write a review");
+
+                    switch (result)
+                    {
+                        case "Play":
+                            StandardCommands.PlayCommand.Execute(Item);
+                            break;
+                        case "Delete":
+                            StandardCommands.DeleteCommand.Execute(Item);
+                            break;
+                        case "Add to Collection":
+                            StandardCommands.AddToCollectionCommand.Execute(Item);
+                            break;
+                        case "Write a review":
+                            StandardCommands.WriteReviewCommand.Execute(Item);
+                            break;
+                    }
                 }
                 else
                 {
@@ -55,6 +64,19 @@ namespace OverAudible.ViewModels
                    "Download",
                    "Add to Collection",
                    "Write a review");
+
+                    switch (result)
+                    {
+                        case "Download":
+                            StandardCommands.DownloadCommand.Execute(Item);
+                            break;
+                        case "Add to Collection":
+                            StandardCommands.AddToCollectionCommand.Execute(Item);
+                            break;
+                        case "Write a review":
+                            StandardCommands.WriteReviewCommand.Execute(Item);
+                            break;
+                    }
                 }
             }
             else
@@ -62,6 +84,16 @@ namespace OverAudible.ViewModels
                 string result = await Shell.Current.CurrentPage.DisplayActionSheetAsync("More Options", "Cancel", null,
                    "Add to cart",
                    "Add to Wishlist");
+
+                switch (result)
+                {
+                    case "Add to cart":
+                        StandardCommands.AddToCartCommand.Execute(Item);
+                        break;
+                    case "Add to Wishlist":
+                        StandardCommands.AddToWishlistCommand.Execute(Item);
+                        break;
+                }
             }
            
         }

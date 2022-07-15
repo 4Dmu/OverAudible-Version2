@@ -64,7 +64,7 @@
                         Command="{Binding StandardCommands.PlayCommand}" CommandParameter="{Binding Item}"/>
                 <Button Content="Add to Collection"  
                         Height="30" Margin="5" Visibility="{Binding Item.IsInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Command="{Binding AddToCollectionCommand}" CommandParameter="{Binding Item}"/>
+                        Command="{Binding StandardCommands.AddToCollectionCommand}" CommandParameter="{Binding Item}"/>
                 <Button Content="Add to cart"  
                         Height="30" Margin="5" Visibility="{Binding Item.IsNotInLibrary, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Command="{Binding StandardCommands.AddToCartCommand}" CommandParameter="{Binding Item}"/>

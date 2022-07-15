@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using OverAudible.Models;
 using OverAudible.Services;
 using OverAudible.EventMessages;
+using OverAudible.ViewModels;
 
 namespace OverAudible.Views
 {

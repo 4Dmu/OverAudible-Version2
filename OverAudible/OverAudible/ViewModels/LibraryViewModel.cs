@@ -297,27 +297,28 @@ namespace OverAudible.ViewModels
 
                     foreach (Collection col in Collections)
                     {
-                        if (col.BookAsins.Count == 1)
+                        if (col.BookAsins.Count <= 1)
                         {
-                            col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
+                            var i = TotalLibrary.First(x => x.Asin == col.BookAsins[0]);
+                            col.Image1 = i.ProductImages.The500.AbsoluteUri;
                         }
-                        if (col.BookAsins.Count == 2)
+                        else if (col.BookAsins.Count >= 2)
                         {
-                            col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
-                            col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
+                            col.Image1 = TotalLibrary.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
+                            col.Image2 = TotalLibrary.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
                         }
-                        if (col.BookAsins.Count == 3)
+                        else if(col.BookAsins.Count >= 3)
                         {
-                            col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
-                            col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
-                            col.Image3 = Library.First(x => x.Asin == col.BookAsins[2]).ProductImages.The500.AbsoluteUri;
+                            col.Image1 = TotalLibrary.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
+                            col.Image2 = TotalLibrary.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
+                            col.Image3 = TotalLibrary.First(x => x.Asin == col.BookAsins[2]).ProductImages.The500.AbsoluteUri;
                         }
-                        if (col.BookAsins.Count == 4)
+                        else if(col.BookAsins.Count >= 4)
                         {
-                            col.Image1 = Library.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
-                            col.Image2 = Library.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
-                            col.Image3 = Library.First(x => x.Asin == col.BookAsins[2]).ProductImages.The500.AbsoluteUri;
-                            col.Image4 = Library.First(x => x.Asin == col.BookAsins[3]).ProductImages.The500.AbsoluteUri;
+                            col.Image1 = TotalLibrary.First(x => x.Asin == col.BookAsins[0]).ProductImages.The500.AbsoluteUri;
+                            col.Image2 = TotalLibrary.First(x => x.Asin == col.BookAsins[1]).ProductImages.The500.AbsoluteUri;
+                            col.Image3 = TotalLibrary.First(x => x.Asin == col.BookAsins[2]).ProductImages.The500.AbsoluteUri;
+                            col.Image4 = TotalLibrary.First(x => x.Asin == col.BookAsins[3]).ProductImages.The500.AbsoluteUri;
                         }
                     }
                 }

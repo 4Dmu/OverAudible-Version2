@@ -80,6 +80,7 @@ namespace OverAudible
             Routing.RegisterRoute(nameof(BookDetailsView), typeof(BookDetailsView));
             Routing.RegisterRoute(nameof(CollectionDetailsView), typeof(CollectionDetailsView));
             Routing.RegisterRoute(nameof(NewCollectionModal), typeof(NewCollectionModal));
+            Routing.RegisterRoute(nameof(AddToCollectionModal), typeof(AddToCollectionModal));
             Routing.RegisterRoute(nameof(FilterModal), typeof(FilterModal));
 
             Constants.DownloadFolder.EnsureFolderExists();

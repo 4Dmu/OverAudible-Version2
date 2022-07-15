@@ -302,6 +302,49 @@ namespace OverAudible.Commands
 
 
     [Inject(InjectionType.Transient)]
+    public class DeleteCommand : AsyncCommandBase
+    {
+        public override async Task ExecuteAsync(object paramater)
+        {
+            if (paramater is Item item)
+            {
+                await Task.Delay(1);
+            }
+        }
+    }
+
+
+    [Inject(InjectionType.Transient)]
+    public class AddToCollectionCommand : AsyncCommandBase
+    {
+        public override async Task ExecuteAsync(object paramater)
+        {
+            if (paramater is Item item)
+            {
+                await Shell.Current.ModalGoToAsync(nameof(AddToCollectionModal), new Dictionary<string, object>
+                {
+                    {"ItemParam", item }
+                });
+            }
+        }
+    }
+
+
+    [Inject(InjectionType.Transient)]
+    public class WriteReviewCommand : AsyncCommandBase
+    {
+        public override async Task ExecuteAsync(object paramater)
+        {
+            if (paramater is Item item)
+            {
+                await Task.Delay(1);
+                Shell.Current.CurrentPage.DisplayAlert("Alert", "Sorry but the ability to write reviews has not yet been added at this time");
+            }
+        }
+    }
+
+
+    [Inject(InjectionType.Transient)]
     public class StandardCommands
     {
         public AddToCartCommand AddToCartCommand { get; }
@@ -311,13 +354,19 @@ namespace OverAudible.Commands
         public DownloadCommand DownloadCommand { get; }
         public PlaySampleCommand PlaySampleCommand { get; }
         public StopSampleCommand StopSampleCommand { get; }
+        public DeleteCommand DeleteCommand { get; }
+        public WriteReviewCommand WriteReviewCommand { get; }
+        public AddToCollectionCommand AddToCollectionCommand { get; }
 
         public StandardCommands(AddToCartCommand addToCartCommand, 
-            AddToWishlistCommand addToWishlistCommand, 
-            RemoveFromWishlistCommand removeFromWishlistCommand, 
-            PlayCommand playCommand, DownloadCommand downloadCommand, 
-            PlaySampleCommand playSampleCommand, 
-            StopSampleCommand stopSampleCommand)
+            AddToWishlistCommand addToWishlistCommand,
+            RemoveFromWishlistCommand removeFromWishlistCommand,
+            PlayCommand playCommand, DownloadCommand downloadCommand,
+            PlaySampleCommand playSampleCommand,
+            StopSampleCommand stopSampleCommand,
+            DeleteCommand deleteCommand, 
+            WriteReviewCommand writeReviewCommand, 
+            AddToCollectionCommand addToCollectionCommand)
         {
             AddToCartCommand = addToCartCommand;
             AddToWishlistCommand = addToWishlistCommand;
@@ -326,6 +375,9 @@ namespace OverAudible.Commands
             DownloadCommand = downloadCommand;
             PlaySampleCommand = playSampleCommand;
             StopSampleCommand = stopSampleCommand;
+            DeleteCommand = deleteCommand;
+            WriteReviewCommand = writeReviewCommand;
+            AddToCollectionCommand = addToCollectionCommand;
         }
     }
 

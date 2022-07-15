@@ -132,7 +132,6 @@ namespace OverAudible.API
             return wishlist;
         }
 
-
         public async Task<List<Collection>> GetCollectionsWithItemsAsync()
         {
             var url = "/1.0/collections";
@@ -261,5 +260,33 @@ namespace OverAudible.API
             return l;
         }
         
+        public async Task AddItemToCollection(Item item, Collection collection)
+        {
+            string url = $"/1.0/collections/{collection.CollectionId}/items";
+            
+        }
+
+        public async Task<string> AddItemsToCollectionAsync(string collectionId, List<string> asins)
+        {
+            var asinsJson = "";
+            foreach (var item in asins)
+            {
+                asinsJson += "\"" + item + "\",";
+            }
+            if (asinsJson.Length > 0)
+                asinsJson = asinsJson.Substring(0, asinsJson.Length - 1);
+            var url = "/1.0/collections/" + collectionId + "/items";
+            var json =
+                "{ \"collection_id\":"
+                + "\""
+                + collectionId
+                + "\","
+                + "\"asins\": ["
+                + asinsJson
+                + "]}";
+            var d = await Api.AdHocAuthenticatedPostAsync(url, json);
+            var result = await d.Content.ReadAsStringAsync();
+            return result;
+        }
     }
 }
