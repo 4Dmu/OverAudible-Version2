@@ -20,6 +20,8 @@ namespace OverAudible.ViewModels
     {
         public StandardCommands StandardCommands { get; }
 
+        public bool IsPlayingSample { get; set; } = false;
+
         [ObservableProperty]
         Item item;
 
@@ -98,7 +100,20 @@ namespace OverAudible.ViewModels
            
         }
 
-        
+        [RelayCommand]
+        void Sample(Item item)
+        {
+            if (IsPlayingSample)
+            {
+                StandardCommands.StopSampleCommand.Execute(null);
+                IsPlayingSample = false;
+            }
+            else
+            {
+                IsPlayingSample = true;
+                StandardCommands.PlaySampleCommand.Execute(item);
+            }
+        }
 
     }
 }
