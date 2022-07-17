@@ -5,7 +5,7 @@ on:
 	    tags:
 		    - "OverAudible/v*"
 env:
-    PROJECT_PATH: OverAudible/OverAudible.csproj
+    PROJECT_PATH: OverAudible/OverAudible/OverAudible.csproj
 
 
 jobs:
