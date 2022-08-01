@@ -13,16 +13,24 @@ using System.Windows;
 namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Transient)]
-    public partial class SettingsViewModel : ViewModelBase
+    public class SettingsViewModel : BaseViewModel
     {
+        public SettingsViewModel()
+        {
+            ToogleThemeCommand = new(ToogleTheme);
+            ManageAccountCommand = new(ManageAccount);
+            LogOutCommand = new(LogOut);
+        }
 
-        [RelayCommand]
+        public RelayCommand ToogleThemeCommand { get; }
+        public RelayCommand ManageAccountCommand { get; }
+        public RelayCommand LogOutCommand { get; }
+
         void ToogleTheme()
         {
             Shell.Current.ToggleTheme();
         }
 
-        [RelayCommand]
         void ManageAccount()
         {
             var destinationurl = "https://www.audible.com/account";
@@ -33,7 +41,6 @@ namespace OverAudible.ViewModels
             System.Diagnostics.Process.Start(sInfo);
         }
 
-        [RelayCommand]
         void LogOut()
         {
             File.Delete(OverAudible.API.UserSetup.IDENTITY_FILE_PATH);

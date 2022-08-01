@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using OverAudible.API;
 using OverAudible.Models;
 using OverAudible.Services;
@@ -16,12 +15,15 @@ namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Transient)]
     [QueryProperty("ItemParam", "ItemParam")]
-    public partial class AddToCollectionModalViewModel : ViewModelBase
+    public class AddToCollectionModalViewModel : BaseViewModel
     {
         private readonly LibraryService _libraryService;
 
-        [ObservableProperty]
         Item itemParam;
+
+        public Item ItemParam { get => itemParam; set => SetProperty(ref itemParam, value); }
+
+        public AsyncRelayCommand<Collection> SelectCollectionCommand { get; }
 
         public ConcurrentObservableCollection<Collection> Collections { get; }
 
@@ -29,7 +31,7 @@ namespace OverAudible.ViewModels
         {
             _libraryService = libraryService;
             Collections = new();
-
+            SelectCollectionCommand = new AsyncRelayCommand<Collection>(SelectCollection);
         }
 
         public async Task LoadAsync()
@@ -42,7 +44,6 @@ namespace OverAudible.ViewModels
             IsBusy = false;
         }
 
-        [RelayCommand]
         async Task SelectCollection(Collection c)
         {
             var client = await ApiClient.GetInstance();

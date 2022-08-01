@@ -16,13 +16,14 @@ using OverAudible.Commands;
 namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Transient)]
-    public partial class CartViewModel : ViewModelBase
+    public class CartViewModel : BaseViewModel
     {
         private readonly CartService _cartService;
         private StandardCommands _commands;
 
-        [ObservableProperty]
         decimal subTotal;
+
+        public decimal SubTotal { get => subTotal; set => SetProperty(ref subTotal, value); }
 
         public ConcurrentObservableCollection<Item> Cart { get; private set; }
 
@@ -40,6 +41,8 @@ namespace OverAudible.ViewModels
                 var v = Cart.Select(x => x.Price.LowestPrice.Base).Sum();
                 SubTotal = v is null ? 0.0m : (decimal)v;
             };
+            RemoveFromCartCommand = new(RemoveFromCart);
+            RemoveFromCartAndAddToWishlistCommand = new(RemoveFromCartAndAddToWishlist);
         }
 
         private void OnRefreshCartMessageReceived(RefreshCartMessage obj)
@@ -50,14 +53,15 @@ namespace OverAudible.ViewModels
             }
         }
 
-        [RelayCommand]
+        public AsyncRelayCommand<Item> RemoveFromCartCommand { get; }
+        public AsyncRelayCommand<Item> RemoveFromCartAndAddToWishlistCommand { get; }
+
         async Task RemoveFromCart(Item item)
         {
             Cart.Remove(item);
             _cartService.RemoveCartItem(item);
         }
 
-        [RelayCommand]
         async Task RemoveFromCartAndAddToWishlist(Item item)
         {
             await RemoveFromCart(item);

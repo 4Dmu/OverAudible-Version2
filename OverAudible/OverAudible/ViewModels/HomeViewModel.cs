@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Transient)]
-    public partial class HomeViewModel : ViewModelBase
+    public class HomeViewModel : BaseViewModel
     {
         private readonly HomeService _homeService;
 
-        [ObservableProperty]
         AudiblePage homePage;
+        public AudiblePage HomePage { get => homePage; set => SetProperty(ref homePage, value); }
 
         public HomeViewModel(HomeService homeService)
         {

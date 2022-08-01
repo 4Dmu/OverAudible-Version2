@@ -18,7 +18,7 @@ using OverAudible.Commands;
 namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Singleton)]
-    public partial class BrowseViewModel : ViewModelBase
+    public class BrowseViewModel : BaseViewModel
     {
         public Categorie CategoryFilter { get; private set; } = Categorie.AllCategories;
         public Lengths LengthFilter { get; private set; } = Lengths.AllLengths;
@@ -28,23 +28,43 @@ namespace OverAudible.ViewModels
 
         public ConcurrentObservableCollection<Item> Results { get; set; }
 
-        [ObservableProperty]
         int currentPage = 0;
+
+        public int CurrentPage { get => currentPage; set => SetProperty(ref currentPage, value); }
 
         private int itemPerPage { get; set; } = 50;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ShowBrowseContent))]
-        [NotifyPropertyChangedFor(nameof(NotShowBrowseContent))]
         string searchText;
+
+        public string SearchText
+        {
+            get => searchText;
+            set
+            {
+                if (SetProperty(ref searchText, value))
+                {
+                    OnPropertyChanged(nameof(ShowBrowseContent));
+                    OnPropertyChanged(nameof(NotShowBrowseContent));
+                }
+            }
+        }
 
         public ShellUI.Commands.AsyncRelayCommand NavigateBackCommand { get; }
         public  ShellUI.Commands.AsyncRelayCommand NavigateNextCommand { get; }
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(ShowBrowseContent))]
-        [NotifyPropertyChangedFor(nameof(NotShowBrowseContent))]
         bool showBrowseC;
+        public bool ShowBrowseC
+        {
+            get => showBrowseC;
+            set
+            {
+                if (SetProperty(ref showBrowseC, value))
+                {
+                    OnPropertyChanged(nameof(ShowBrowseContent));
+                    OnPropertyChanged(nameof(NotShowBrowseContent));
+                }
+            }
+        }
 
         public bool ShowBrowseContent => string.IsNullOrWhiteSpace(searchText) && !ShowBrowseC;
 
@@ -80,6 +100,11 @@ namespace OverAudible.ViewModels
             }, () => Results.Count != 0);
 
             Shell.Current.EventAggregator.Subscribe<RefreshBrowseMessage>(OnRefreshBrowseMessageReceived);
+
+            SelectCategorieCommand = new(SelectCategorie);
+            SearchCommand = new(Search);
+            ShowFilterCommand = new(ShowFilter);
+            ClearCommand = new(Clear);
             
         }
 
@@ -97,7 +122,12 @@ namespace OverAudible.ViewModels
             }
         }
 
-        [RelayCommand]
+        public AsyncRelayCommand<Categorie> SelectCategorieCommand { get; }
+        public AsyncRelayCommand SearchCommand { get; }
+        public AsyncRelayCommand ShowFilterCommand { get; }
+
+        public RelayCommand ClearCommand { get; }
+
         async Task SelectCategorie(Categorie categorie)
         {
             if (IsBusy)
@@ -125,7 +155,6 @@ namespace OverAudible.ViewModels
             IsBusy = false;
         }
 
-        [RelayCommand]
         async Task Search()
         {
             if (IsBusy || string.IsNullOrWhiteSpace(searchText))
@@ -190,7 +219,6 @@ namespace OverAudible.ViewModels
             IsBusy = false;
         }
 
-        [RelayCommand]
         void Clear()
         {
             this.ShowBrowseC = false;
@@ -200,7 +228,6 @@ namespace OverAudible.ViewModels
             NavigateBackCommand.OnCanExecuteChanged();
         }
 
-        [RelayCommand]
         async Task ShowFilter()
         {
             await Shell.Current.ModalGoToAsync(nameof(FilterModal), new Dictionary<string, object>

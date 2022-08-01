@@ -20,14 +20,15 @@ namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Transient)]
     [QueryProperty("Collection", "CollectionParam")]
-    public partial class CollectionDetailsViewModel : ViewModelBase
+    public class CollectionDetailsViewModel : BaseViewModel
     {
         private readonly LibraryService _libraryService;
         private const int bookCount = 25;
         private const int bookCardHeightValue = 30;
 
-        [ObservableProperty]
         Collection collection;
+
+        public Collection Collection { get => collection; set => SetProperty(ref collection, value); }
 
         public ConcurrentObservableCollection<Item>? Books { get; private set; } = null;
 
@@ -53,6 +54,9 @@ namespace OverAudible.ViewModels
                     Books.AddRange(TotalBooks.Count > bookCount ? TotalBooks.GetRange(0, bookCount) : TotalBooks);
                 }
             };
+            SampleCommand = new(Sample);
+            BooksScrollCommand = new(BooksScroll);
+
         }
 
         private void OnSampleStoped(SampleStopedMessage obj)
@@ -63,7 +67,9 @@ namespace OverAudible.ViewModels
             }
         }
 
-        [RelayCommand]
+        public RelayCommand<RoutedEventArgs> BooksScrollCommand { get; }
+        public RelayCommand<Item> SampleCommand { get; }
+
         void BooksScroll(RoutedEventArgs args)
         {
             if (IsBusy)
@@ -99,7 +105,6 @@ namespace OverAudible.ViewModels
             }
         }
 
-        [RelayCommand]
         void Sample(Item item)
         {
             if (IsPlayingSample)

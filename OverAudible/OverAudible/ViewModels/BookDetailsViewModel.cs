@@ -16,22 +16,27 @@ namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Transient)]
     [QueryProperty("Item", "ItemParam")]
-    public partial class BookDetailsViewModel : ViewModelBase
+    public class BookDetailsViewModel : BaseViewModel
     {
         public StandardCommands StandardCommands { get; }
 
         public bool IsPlayingSample { get; set; } = false;
 
-        [ObservableProperty]
         Item item;
+
+        public Item Item { get => item; set => SetProperty(ref item, value); }
+
+        public AsyncRelayCommand MoreOptionsCommand { get; }
+        public RelayCommand<Item> SampleCommand { get; }
 
         public BookDetailsViewModel(StandardCommands commands)
         {
             StandardCommands = commands;
+            MoreOptionsCommand = new AsyncRelayCommand(MoreOptions);
+            SampleCommand = new RelayCommand<Item>(Sample);
         }
 
 
-        [RelayCommand]
         async Task MoreOptions()
         {
             if (Item.IsInLibrary)
@@ -100,7 +105,6 @@ namespace OverAudible.ViewModels
            
         }
 
-        [RelayCommand]
         void Sample(Item item)
         {
             if (IsPlayingSample)

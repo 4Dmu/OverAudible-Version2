@@ -40,7 +40,7 @@ namespace OverAudible
     public partial class App : Application
     {
         IHost _host;
-
+        
         public App()
         {
             _host = Host.CreateDefaultBuilder()
@@ -157,6 +157,13 @@ namespace OverAudible
             _host.Dispose();
             _host = null;
             base.OnExit(e);
+        }
+
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            File.WriteAllText(Constants.DownloadFolder + @"\" + "Error.txt", e.Exception.Message);
+            ShellUI.Controls.MessageBox.Show("An unhandled exception just occurred: " + e.Exception.Message, "Exception Sample", ShellUI.Controls.MessageBoxButton.OK, ShellUI.Controls.MessageBoxImage.Warning);
+            e.Handled = true;
         }
     }
 

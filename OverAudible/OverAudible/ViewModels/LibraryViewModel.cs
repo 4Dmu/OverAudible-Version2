@@ -27,7 +27,7 @@ namespace OverAudible.ViewModels
 {
     [Inject(InjectionType.Singleton)]
     [QueryProperty("UseOfflineMode", "UseOfflineMode")]
-    public partial class LibraryViewModel : ViewModelBase
+    public class LibraryViewModel : BaseViewModel
     {
         private const int bookCount = 25;
         private const int bookCardHeightValue = 30;
@@ -47,9 +47,16 @@ namespace OverAudible.ViewModels
 
         public bool IsPlayingSample { get; set; } = false;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(DontUseOfflineMode))]
         bool useOfflineMode;
+        public bool UseOfflineMode 
+        { 
+            get => useOfflineMode; 
+            set
+            {
+                if (SetProperty(ref useOfflineMode, value))
+                    OnPropertyChanged(nameof(DontUseOfflineMode));
+            }
+        }
 
         public bool DontUseOfflineMode => !UseOfflineMode;
 
@@ -68,6 +75,11 @@ namespace OverAudible.ViewModels
                 Debug.WriteLine($"{pco.Asin} | {pco.Title} | pc: {pco.downloadProgress.ProgressPercentage} |  br: {pco.downloadProgress.BytesReceived} | tbr: {pco.downloadProgress.TotalBytesToReceive}");
             };
             _dataService = dataService;
+            CreateCollectionCommand = new(CreateCollection);
+            CollectionOptionsCommand = new(CollectionOptions);
+            SampleCommand = new(Sample);
+            WishlistScrollCommand = new(WishlistScroll);
+            LibraryScrollCommand = new(LibraryScroll);
         }
 
         private async void OnLibraryRefreshMessageReceived(RefreshLibraryMessage obj)
@@ -100,13 +112,17 @@ namespace OverAudible.ViewModels
             }
         }
 
-        [RelayCommand]
+        public AsyncRelayCommand CreateCollectionCommand { get; }
+        public AsyncRelayCommand<(string,string)> CollectionOptionsCommand { get; }
+        public RelayCommand<Item> SampleCommand { get; }
+        public RelayCommand<RoutedEventArgs> WishlistScrollCommand { get; }
+        public RelayCommand<RoutedEventArgs> LibraryScrollCommand { get; }
+
         async Task CreateCollection()
         {
             await Shell.Current.ModalGoToAsync(nameof(NewCollectionModal));
         }
 
-        [RelayCommand]
         async Task CollectionOptions((string, string) nameAndID)
         {
             string result = await Shell.Current.CurrentPage.DisplayActionSheetAsync(nameAndID.Item1, "Cancel", null, "Delete");
@@ -126,7 +142,6 @@ namespace OverAudible.ViewModels
             }
         }
 
-        [RelayCommand]
         void Sample(Item item)
         {
             if (IsPlayingSample)
@@ -141,7 +156,6 @@ namespace OverAudible.ViewModels
             }
         }
 
-        [RelayCommand]
         void WishlistScroll(RoutedEventArgs args)
         {
             if (IsBusy)
@@ -177,7 +191,6 @@ namespace OverAudible.ViewModels
             }
         }
 
-        [RelayCommand]
         void LibraryScroll(RoutedEventArgs args)
         {
             if (IsBusy)
